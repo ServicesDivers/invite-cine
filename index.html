@@ -1,830 +1,252 @@
 <!DOCTYPE html>
-<html lang="fr" class="h-full">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dis Oui — On se fait un ciné ? 🍿</title>
-  
-  <!-- Tailwind CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dis Oui — Générateur d'Invitations</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Canvas Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  
-  <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-cream: #f6f1e8;
-      --card-cream: #fcfaf7;
-      --border-warm: #e5dbc2;
-      --border-subtle: #ebd1bd;
-      --burgundy: #6b1124;
-      --burgundy-hover: #500b1a;
-      --gold-tan: #b88d4c;
-      --text-dark: #2c2725;
-      --text-muted: #8c827a;
-    }
-
-    body {
-      background-color: var(--bg-cream);
-      color: var(--text-dark);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-image: 
-        radial-gradient(at 10% 10%, rgba(197, 160, 89, 0.08) 0px, transparent 50%),
-        radial-gradient(at 90% 90%, rgba(107, 17, 36, 0.06) 0px, transparent 50%);
-      background-attachment: fixed;
-    }
-
-    .font-serif-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-    }
-
-    /* DisOui style card double border */
-    .disoui-card {
-      background-color: var(--card-cream);
-      border: 1px solid var(--border-warm);
-      position: relative;
-      box-shadow: 0 15px 35px -10px rgba(107, 17, 36, 0.05), 0 5px 15px -5px rgba(0, 0, 0, 0.02);
-    }
-
-    .disoui-card::before {
-      content: '';
-      position: absolute;
-      inset: 4px;
-      border: 1px solid rgba(229, 219, 202, 0.6);
-      pointer-events: none;
-      border-radius: inherit;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--bg-cream);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #d8cebe;
-      border-radius: 3px;
-    }
-
-    /* Alternating UP / DOWN Smooth Button Motion */
-    #fleeBtn {
-      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, border-color 0.2s;
-      user-select: none;
-      touch-action: manipulation;
-    }
-
-    /* Active selected time slots */
-    .time-slot-selected {
-      background-color: var(--burgundy) !important;
-      color: #ffffff !important;
-      border-color: var(--burgundy) !important;
-      box-shadow: 0 4px 12px rgba(107, 17, 36, 0.25);
-    }
-
-    /* Confetti canvas fix */
-    #confettiCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
-    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F7F4EF; color: #4A3B32; }
+    .font-serif-custom { font-family: 'EB Garamond', serif; }
+    .btn-moving { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-amber-100 selection:text-amber-900">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-  <canvas id="confettiCanvas"></canvas>
+  <div class="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[#E6DEC9] text-center max-w-md w-full relative overflow-hidden">
+    
+    <!-- ========================================== -->
+    <!-- VUE INVITÉ (S'affiche lorsqu'on ouvre le lien généré) -->
+    <!-- ========================================== -->
+    <div id="viewMode" class="hidden">
+      <div class="inline-block bg-[#A88B58]/10 text-[#A88B58] text-xs px-3 py-1 rounded-full font-medium mb-3 border border-[#A88B58]/20">
+        POUR TOI, <span id="inviteeNameDisplay">...</span>
+      </div>
+      
+      <div id="emojiDisplay" class="text-5xl mb-2">✨</div>
+      <h1 id="headlineDisplay" class="text-3xl font-serif-custom text-[#5C1D24] font-bold mb-2">On se fait une sortie ?</h1>
+      <p class="text-xs text-[#8C6D62] italic mb-6">(dire non ne sert à rien, mais tu peux essayer)</p>
 
-  <header class="w-full max-w-xl mx-auto px-6 pt-6 pb-2 flex items-center justify-between">
-    <!-- Brand Logo -->
-    <a href="#" onclick="switchToCreatorView(); return false;" class="text-2xl font-serif-title font-bold text-[#6b1124] tracking-tight hover:opacity-80 transition">
-      Dis Oui
-    </a>
-
-    <!-- Navigation Header -->
-    <div class="flex items-center space-x-6 text-xs uppercase tracking-widest text-[#8c827a] font-medium">
-      <div class="space-x-1 hidden sm:block">
-        <span class="text-[#6b1124] font-bold border-b border-[#6b1124] pb-0.5">FR</span>
-        <span>•</span>
-        <span class="hover:text-gray-700 cursor-pointer">EN</span>
-        <span>•</span>
-        <span class="hover:text-gray-700 cursor-pointer">ES</span>
-        <span>•</span>
-        <span class="hover:text-gray-700 cursor-pointer">DE</span>
+      <div class="bg-[#FAF8F5] p-4 rounded-xl border border-[#E6DEC9] mb-6 text-left text-sm space-y-2">
+        <p>✨ <strong>Activité :</strong> <span id="activityDisplay">Sortie</span></p>
+        <p>📍 <strong>Lieu :</strong> <span id="locationDisplay">À définir</span></p>
+        <p>📅 <strong>Quand :</strong> <span id="datetimeDisplay">À convenir</span></p>
+        <p id="noteContainer" class="hidden italic text-xs text-[#8C6D62] pt-1">💬 <span id="noteDisplay"></span></p>
+        <p id="senderDisplay" class="text-xs text-right text-[#8C6D62] pt-2 border-t border-[#E6DEC9]">Proposé par <span>...</span></p>
       </div>
 
-      <!-- Step Indicator Dashes -->
-      <div id="stepDashes" class="flex items-center space-x-1.5">
-        <div id="dash1" class="h-1 w-6 rounded-full bg-[#6b1124] transition-all duration-300"></div>
-        <div id="dash2" class="h-1 w-6 rounded-full bg-[#e2d9cc] transition-all duration-300"></div>
-        <div id="dash3" class="h-1 w-6 rounded-full bg-[#e2d9cc] transition-all duration-300"></div>
-        <div id="dash4" class="h-1 w-6 rounded-full bg-[#e2d9cc] transition-all duration-300"></div>
+      <!-- Boutons Oui / Non -->
+      <div class="flex items-center justify-center gap-4 relative min-h-[70px]">
+        <button id="yesBtn" class="bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3 px-8 rounded-lg shadow-md transition text-base z-10">
+          Oui ! ✨
+        </button>
+        <button id="noBtn" class="btn-moving bg-white border border-[#5C1D24]/30 text-[#5C1D24] font-medium py-3 px-6 rounded-lg shadow-sm text-base">
+          Non
+        </button>
       </div>
     </div>
-  </header>
 
-  <!-- Main View Area -->
-  <main class="w-full max-w-xl mx-auto px-4 py-4 flex-grow flex flex-col justify-center">
-
-    <!-- ==================== MODE CRÉATEUR ==================== -->
-    <div id="creatorMode" class="w-full transition-all duration-300">
-      
-      <!-- STEP 1: Vous êtes qui ? -->
-      <div id="step1View" class="disoui-card rounded-2xl p-6 sm:p-8">
-        <div class="text-[11px] font-bold uppercase tracking-widest text-[#8c827a] mb-2">
-          Étape 1 sur 4
-        </div>
-        <h1 class="text-3xl sm:text-4xl font-serif-title italic font-normal text-[#6b1124] mb-6">
-          Vous êtes qui ?
-        </h1>
-
-        <div class="space-y-5">
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#6e665f] mb-2">
-              Son prénom (ou son surnom)
-            </label>
-            <input type="text" id="inputTargetName" value="Merveille" placeholder="Ex: Merveille, Chérie..."
-              class="w-full bg-[#f8f5ee] border border-[#e2d9cc] rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:border-[#6b1124] focus:ring-1 focus:ring-[#6b1124] transition text-base" />
-            <p class="text-xs italic text-[#8c827a] mt-1.5">
-              Le surnom marche mieux. C'est le détail qui fait « c'est vraiment pour moi ».
-            </p>
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#6e665f] mb-2">
-              Ton prénom
-            </label>
-            <input type="text" id="inputSenderName" value="Le garçon de DGC" placeholder="Ex: Alex, Le garçon de DGC..."
-              class="w-full bg-[#f8f5ee] border border-[#e2d9cc] rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:border-[#6b1124] focus:ring-1 focus:ring-[#6b1124] transition text-base" />
-          </div>
-
-          <button onclick="goToStep(2)"
-            class="w-full mt-4 bg-[#6b1124] hover:bg-[#500b1a] text-white font-semibold py-4 px-6 rounded-lg shadow-md uppercase tracking-widest text-xs transition transform active:scale-[0.99]">
-            Continuer
-          </button>
-        </div>
-      </div>
-
-      <!-- STEP 2: Vous allez faire quoi ? -->
-      <div id="step2View" class="disoui-card rounded-2xl p-6 sm:p-8 hidden">
-        <div class="text-[11px] font-bold uppercase tracking-widest text-[#8c827a] mb-2">
-          Étape 2 sur 4
-        </div>
-        <h1 class="text-3xl sm:text-4xl font-serif-title italic font-normal text-[#6b1124] mb-6">
-          Vous allez faire quoi ?
-        </h1>
-
-        <div class="space-y-5">
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#6e665f] mb-2">
-              L'activité
-            </label>
-            <input type="text" id="inputActivity" value="Ciné" placeholder="Ex: Ciné, Resto, Verre..."
-              class="w-full bg-[#f8f5ee] border border-[#e2d9cc] rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:border-[#6b1124] focus:ring-1 focus:ring-[#6b1124] transition text-base" />
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#6e665f] mb-2">
-              Le lieu
-            </label>
-            <input type="text" id="inputLocation" value="Culture Park" placeholder="Ex: Culture Park, UGC Les Halles..."
-              class="w-full bg-[#f8f5ee] border border-[#e2d9cc] rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:border-[#6b1124] focus:ring-1 focus:ring-[#6b1124] transition text-base" />
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#6e665f] mb-2">
-              Un détail (facultatif)
-            </label>
-            <input type="text" id="inputDetail" value="Faire connaissance & pop-corn" placeholder="Ex: Faire connaissance, Pop-corn salé..."
-              class="w-full bg-[#f8f5ee] border border-[#e2d9cc] rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:border-[#6b1124] focus:ring-1 focus:ring-[#6b1124] transition text-base" />
-          </div>
-
-          <div class="space-y-2 pt-2">
-            <button onclick="goToStep(3)"
-              class="w-full bg-[#6b1124] hover:bg-[#500b1a] text-white font-semibold py-4 px-6 rounded-lg shadow-md uppercase tracking-widest text-xs transition transform active:scale-[0.99]">
-              Continuer
-            </button>
-            <button onclick="goToStep(1)"
-              class="w-full bg-transparent text-[#6b1124] border border-[#6b1124]/30 hover:bg-[#6b1124]/5 font-semibold py-3 px-6 rounded-lg uppercase tracking-widest text-xs transition">
-              Retour
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP 3: Quand ? -->
-      <div id="step3View" class="disoui-card rounded-2xl p-6 sm:p-8 hidden">
-        <div class="text-[11px] font-bold uppercase tracking-widest text-[#8c827a] mb-2">
-          Étape 3 sur 4
-        </div>
-        <h1 class="text-3xl sm:text-4xl font-serif-title italic font-normal text-[#6b1124] mb-6">
-          Quand ?
-        </h1>
-
-        <div class="space-y-5">
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#6e665f] mb-2">
-              Le jour
-            </label>
-            <input type="text" id="inputDate" value="18 oct. 2026" placeholder="Ex: 18 oct. 2026, Samedi soir..."
-              class="w-full bg-[#f8f5ee] border border-[#e2d9cc] rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:border-[#6b1124] focus:ring-1 focus:ring-[#6b1124] transition text-base" />
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#6e665f] mb-3">
-              Les horaires que tu proposes
-            </label>
-
-            <div id="timeSlotsGrid" class="grid grid-cols-3 gap-2 sm:gap-2.5 max-h-56 overflow-y-auto p-1">
-              <!-- JS Populated -->
-            </div>
-
-            <p class="text-xs italic text-[#8c827a] mt-3">
-              Touche 2 à 5 horaires. C'est elle qui choisira — c'est ce qui transforme l'invitation en vrai rendez-vous.
-            </p>
-          </div>
-
-          <div class="space-y-2 pt-2">
-            <button onclick="goToStep(4)"
-              class="w-full bg-[#6b1124] hover:bg-[#500b1a] text-white font-semibold py-4 px-6 rounded-lg shadow-md uppercase tracking-widest text-xs transition transform active:scale-[0.99]">
-              Continuer
-            </button>
-            <button onclick="goToStep(2)"
-              class="w-full bg-transparent text-[#6b1124] border border-[#6b1124]/30 hover:bg-[#6b1124]/5 font-semibold py-3 px-6 rounded-lg uppercase tracking-widest text-xs transition">
-              Retour
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP 4: QR Code & Lien d'invitation -->
-      <div id="step4View" class="disoui-card rounded-2xl p-6 sm:p-8 hidden">
-        <div class="text-[11px] font-bold uppercase tracking-widest text-[#8c827a] mb-2">
-          Étape 4 sur 4
-        </div>
-        <h1 class="text-3xl sm:text-4xl font-serif-title italic font-normal text-[#6b1124] mb-2">
-          Ton invitation est prête ! 🎉
-        </h1>
-        <p class="text-xs text-[#6e665f] mb-6 leading-relaxed">
-          Partage ce QR Code ou copie le lien ci-dessous. Dès qu'elle ouvre la page, le bouton "Non" fera ses va-et-vient magiques !
-        </p>
-
-        <!-- QR Code Display Box -->
-        <div class="bg-[#f8f5ee] border border-[#e2d9cc] rounded-xl p-5 mb-6 text-center shadow-inner">
-          <p class="text-[11px] font-bold uppercase tracking-widest text-[#8c827a] mb-3">
-            QR Code d'invitation personnalisé
-          </p>
-          
-          <div class="relative inline-block">
-            <img id="qrCodeImg" src="" alt="QR Code Invitation" 
-                 class="w-44 h-44 mx-auto p-2 bg-white rounded-xl shadow-md border border-[#e2d9cc] transition-all duration-300" />
-            
-            <div id="qrLoading" class="absolute inset-0 bg-white/90 rounded-xl flex items-center justify-center text-xs text-[#8c827a] hidden">
-              Génération du QR Code...
-            </div>
-          </div>
-
-          <div class="mt-4 flex justify-center gap-2">
-            <button onclick="downloadQRCode()" 
-                    class="bg-[#b88d4c] hover:bg-[#9e763a] text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5">
-              <span>📥 Télécharger QR Code</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#6e665f] mb-1.5">
-              Lien direct à partager
-            </label>
-            <div class="relative">
-              <input type="text" id="shareableUrlInput" readonly
-                class="w-full bg-[#f8f5ee] border border-[#e2d9cc] rounded-lg pl-3 pr-24 py-3 text-xs text-gray-700 font-mono focus:outline-none" />
-              <button onclick="copyGeneratedLink()" id="copyBtn"
-                class="absolute right-1 top-1 bottom-1 bg-[#6b1124] text-white text-[11px] uppercase tracking-wider font-semibold px-4 rounded-md hover:bg-[#500b1a] transition">
-                Copier
-              </button>
-            </div>
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-2 pt-2">
-            <button onclick="switchToReceiverView()"
-              class="flex-1 bg-[#6b1124] hover:bg-[#500b1a] text-white font-semibold py-3.5 px-4 rounded-lg shadow-sm uppercase tracking-wider text-xs transition text-center">
-              Tester mon invitation 👁️
-            </button>
-            <button onclick="shareViaWhatsApp()"
-              class="flex-1 bg-[#25D366] hover:bg-[#1ebd59] text-white font-semibold py-3.5 px-4 rounded-lg shadow-sm uppercase tracking-wider text-xs transition text-center">
-              Envoyer sur WhatsApp 💬
-            </button>
-          </div>
-
-          <button onclick="goToStep(3)"
-            class="w-full bg-transparent text-[#6b1124] border border-[#6b1124]/30 hover:bg-[#6b1124]/5 font-semibold py-2.5 px-4 rounded-lg uppercase tracking-widest text-xs transition">
-            Modifier les détails
-          </button>
-        </div>
-      </div>
-
+    <!-- ÉCRAN DE CONFIRMATION (Après le clic sur Oui) -->
+    <div id="successMode" class="hidden">
+      <div class="text-5xl mb-3">🎉🥳</div>
+      <h2 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-2">Rendez-vous confirmé !</h2>
+      <p class="text-sm text-[#7D6B63] mb-6">C'est une excellente décision. Envoie-moi un message pour caler les derniers détails !</p>
+      <a id="whatsappConfirmBtn" href="#" target="_blank" class="inline-block bg-[#25D366] hover:bg-[#22bf5b] text-white font-medium py-3 px-6 rounded-lg shadow-md transition text-sm">
+        Prévenir sur WhatsApp 📲
+      </a>
     </div>
 
-    <!-- ==================== MODE DESTINATAIRE (RECEIVER VIEW) ==================== -->
-    <div id="receiverMode" class="w-full hidden">
-      
-      <!-- Top Teaser Badge -->
-      <div class="flex justify-center -mb-3 z-10 relative">
-        <span class="bg-[#b88d4c] text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-sm shadow-sm">
-          Essaie de dire non
-        </span>
-      </div>
+    <!-- ========================================== -->
+    <!-- VUE CRÉATEUR (S'affiche par défaut sur la racine du site) -->
+    <!-- ========================================== -->
+    <div id="createMode">
+      <h1 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-1">Dis Oui 💌</h1>
+      <p class="text-xs text-[#8C6D62] mb-6">Crée une invitation personnalisée avec le bouton "Non" piège.</p>
 
-      <!-- Main Interactive DisOui Invitation Box -->
-      <div id="invitationCard" class="disoui-card rounded-2xl p-6 sm:p-10 text-center relative overflow-hidden min-h-[460px] flex flex-col justify-between">
-        
-        <!-- Header Info -->
+      <form id="inviteForm" class="text-left space-y-3 text-xs">
         <div>
-          <div id="displayTargetHeader" class="text-[11px] uppercase tracking-widest text-[#8c827a] font-medium mb-3">
-            POUR TOI, MERVEILLE
-          </div>
-
-          <h2 id="displayQuestionTitle" class="text-3xl sm:text-4xl font-serif-title text-[#6b1124] font-normal leading-tight mb-2">
-            Ça te dit un ciné avec moi ?
-          </h2>
-
-          <p class="text-xs italic text-[#8c827a] mb-6">
-            (dire non ne sert à rien, mais tu peux essayer)
-          </p>
-
-          <!-- Invitation Details Pill -->
-          <div class="bg-[#f8f5ee] border border-[#e2d9cc]/80 rounded-xl p-4 my-4 max-w-sm mx-auto text-left space-y-2 text-xs text-[#524a44]">
-            <div class="flex items-center space-x-2">
-              <span class="text-base">📍</span>
-              <span><strong>Lieu:</strong> <span id="displayLocation">Culture Park</span></span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="text-base">📅</span>
-              <span><strong>Date:</strong> <span id="displayDate">18 oct. 2026</span></span>
-            </div>
-            <div id="detailRow" class="flex items-center space-x-2">
-              <span class="text-base">✨</span>
-              <span><strong>Note:</strong> <span id="displayDetail">Faire connaissance & pop-corn</span></span>
-            </div>
-            
-            <!-- Time Slots selection for Receiver -->
-            <div class="pt-2 border-t border-[#e2d9cc]/60">
-              <span class="block text-[10px] uppercase font-bold text-[#8c827a] mb-1.5">
-                Choisis l'horaire qui te convient le mieux :
-              </span>
-              <div id="receiverTimesGrid" class="flex flex-wrap gap-1.5">
-                <!-- Selectable time chips -->
-              </div>
-            </div>
-          </div>
+          <label class="block font-medium mb-1">Son prénom / surnom :</label>
+          <input type="text" id="inputInvitee" required placeholder="ex: Sarah" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
         </div>
 
-        <!-- Buttons Container (Oui / Alternating UP/DOWN Non button) -->
-        <div class="mt-4 relative min-h-[140px] flex flex-col items-center justify-center">
-          
-          <div id="buttonsWrapper" class="flex items-center justify-center gap-6 w-full relative h-[80px]">
-            <!-- OUI Button -->
-            <button id="yesBtn" onclick="acceptInvitation()"
-              class="bg-[#6b1124] hover:bg-[#500b1a] text-white font-semibold px-9 py-3.5 rounded-md shadow-md uppercase tracking-wider text-sm transition transform hover:scale-105 active:scale-95 z-10">
-              Oui
-            </button>
-
-            <!-- FLEEING NON Button (Alternates UP / DOWN on click/hover) -->
-            <button id="fleeBtn"
-              class="bg-[#fcfaf7] border border-[#d8cebe] text-[#6b1124] font-medium px-8 py-3 rounded-md text-sm shadow-sm hover:border-[#6b1124] z-20">
-              Non
-            </button>
-          </div>
-
-          <!-- Teasing dynamic footer note -->
-          <div id="dodgeNote" class="text-xs italic text-[#a3978c] mt-2 h-4 transition-all duration-300">
-            Tu es sûr-e...
-          </div>
-
+        <div>
+          <label class="block font-medium mb-1">Ton prénom :</label>
+          <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
         </div>
 
-      </div>
+        <div>
+          <label class="block font-medium mb-1">Type d'activité :</label>
+          <select id="inputCategory" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5] font-medium">
+            <option value="🍿|Cinéma|Ça te dit un ciné ?">🍿 Cinéma</option>
+            <option value="🍷|Restaurant / Dîner|On se fait un resto ?">🍷 Restaurant / Dîner</option>
+            <option value="🍹|Prendre un verre|On va boire un verre ?">🍹 Boire un verre</option>
+            <option value="☕|Café & Balade|Un café & une balade ?">☕ Café & Balade</option>
+            <option value="🥳|Soirée / Fête|Viens à ma soirée !">🥳 Soirée / Fête</option>
+            <option value=" bowling | Bowling / Jeu|Partie de Bowling ?">🎳 Bowling / Jeu</option>
+            <option value="✨|Autre sortie|Une petite sortie ?">✨ Autre (Personnalisé)</option>
+          </select>
+        </div>
 
-      <!-- Back to Creator Link -->
-      <div class="text-center mt-6">
-        <button onclick="switchToCreatorView()" class="text-xs text-[#8c827a] hover:text-[#6b1124] underline transition">
-          ✏️ Créer ou modifier cette invitation
+        <div id="customActivityGroup" class="hidden">
+          <label class="block font-medium mb-1">Nom de l'activité personnalisée :</label>
+          <input type="text" id="inputCustomActivity" placeholder="ex: Escalade, Musée, Concert..." class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Lieu :</label>
+          <input type="text" id="inputLocation" placeholder="ex: Centre-ville, Chez moi, Pathé..." class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Date & Heure :</label>
+          <input type="text" id="inputDatetime" placeholder="ex: Ce vendredi à 20h00" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Petit mot doux (optionnel) :</label>
+          <input type="text" id="inputNote" placeholder="ex: Je m'occupe de tout réserver !" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+        </div>
+
+        <button type="submit" class="w-full bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3 rounded-lg shadow-md transition text-sm mt-4">
+          Générer mon invitation 🚀
         </button>
-      </div>
+      </form>
 
-    </div>
-
-    <!-- ==================== MODE SUCCÈS (CELEBRATION VIEW) ==================== -->
-    <div id="successMode" class="disoui-card rounded-2xl p-8 sm:p-12 text-center hidden">
-      <div class="text-6xl mb-4 animate-bounce">🥳</div>
-      <h2 class="text-3xl sm:text-4xl font-serif-title italic text-[#6b1124] font-normal mb-2">
-        Rendez-vous pris !
-      </h2>
-      <p class="text-sm text-[#6e665f] mb-6">
-        C'est officiel ! Prépare tes meilleures recommandations de films.
-      </p>
-
-      <!-- Confirmation Card Summary -->
-      <div class="bg-[#f8f5ee] border border-[#e2d9cc] rounded-xl p-5 mb-8 text-left space-y-2 text-xs text-[#423b36]">
-        <div><strong>De :</strong> <span id="confirmSender">Le garçon de DGC</span></div>
-        <div><strong>Pour :</strong> <span id="confirmTarget">Merveille</span></div>
-        <div><strong>Rendez-vous :</strong> <span id="confirmActivity">Ciné</span> à <span id="confirmLocation">Culture Park</span></div>
-        <div><strong>Date :</strong> <span id="confirmDate">18 oct. 2026</span></div>
-        <div><strong>Horaire choisi :</strong> <span id="confirmTime" class="font-bold text-[#6b1124]">14:00</span></div>
-      </div>
-
-      <div class="space-y-3">
-        <button onclick="confirmOnWhatsApp()"
-          class="w-full bg-[#25D366] hover:bg-[#1ebd59] text-white font-semibold py-4 px-6 rounded-lg shadow-md uppercase tracking-wider text-xs transition transform hover:scale-[1.02]">
-          Envoyer la réponse sur WhatsApp 💬
-        </button>
-
-        <button onclick="switchToCreatorView()"
-          class="w-full bg-transparent text-[#6b1124] border border-[#6b1124]/30 hover:bg-[#6b1124]/5 font-semibold py-3 px-6 rounded-lg uppercase tracking-wider text-xs transition">
-          Créer ma propre invitation 💖
-        </button>
+      <!-- Résultat avec lien et QR Code -->
+      <div id="createdResult" class="hidden mt-6 pt-6 border-t border-[#E6DEC9]">
+        <p class="text-xs text-green-700 font-semibold mb-2">✅ Lien prêt à être envoyé !</p>
+        <div class="flex items-center gap-2 mb-4">
+          <input type="text" id="generatedUrl" readonly class="w-full p-2 text-xs border border-[#E6DEC9] rounded bg-gray-50">
+          <button id="copyBtn" class="bg-[#5C1D24] text-white px-3 py-2 rounded text-xs font-medium">Copier</button>
+        </div>
+        <div class="text-center">
+          <img id="generatedQr" src="" alt="QR Code" class="mx-auto w-28 h-28 p-1 bg-white border border-[#E6DEC9] rounded-lg mb-2 shadow-sm">
+          <p class="text-[10px] text-[#8C6D62]">Scanne ce QR code ou partage le lien par message.</p>
+        </div>
       </div>
     </div>
 
-  </main>
-
-  <!-- Footer -->
-  <footer class="w-full max-w-xl mx-auto px-6 py-4 text-center text-[11px] text-[#a09489]">
-    <p>Inspiré par Dis Oui — Fabriqué avec ❤️ pour les invitations inoubliables.</p>
-  </footer>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#2c2725] text-white text-xs px-5 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center space-x-2">
-    <span id="toastMsg">Lien copié dans le presse-papier !</span>
   </div>
 
   <script>
-    /* ==================== STATE MANAGEMENT ==================== */
-    const DEFAULT_TIMES = ["11:00", "12:00", "13:00", "14:00", "16:00", "17:00", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:45"];
-    
-    let state = {
-      targetName: "Merveille",
-      senderName: "Le garçon de DGC",
-      activity: "Ciné",
-      location: "Culture Park",
-      detail: "Faire connaissance & pop-corn",
-      date: "18 oct. 2026",
-      availableTimes: ["14:00", "18:00", "20:00"],
-      selectedTime: "14:00",
-      currentStep: 1
-    };
+    const params = new URLSearchParams(window.location.search);
+    const invitee = params.get('to');
+    const sender = params.get('from');
+    const activity = params.get('act');
+    const emoji = params.get('emo');
+    const title = params.get('title');
+    const locationParam = params.get('loc');
+    const timeParam = params.get('time');
+    const noteParam = params.get('note');
 
-    const DODGE_PHRASES = [
-      "Tu es sûre ?",
-      "Sérieusement ? 🥺",
-      "Un petit effort 🍿",
-      "Pop-corn offert !",
-      "Mauvaise touche !",
-      "Essaie encore 😜",
-      "Opération annulée 😇",
-      "Dis Oui plutôt 💖"
-    ];
+    // ==========================================
+    // MODE 1 : LECTURE DE L'INVITATION
+    // ==========================================
+    if (invitee && sender) {
+      document.getElementById('createMode').classList.add('hidden');
+      document.getElementById('viewMode').classList.remove('hidden');
 
-    const DODGE_NOTES = [
-      "Tu es sûr-e...",
-      "Hop ! Vers le haut !",
-      "Hop ! Vers le bas !",
-      "Impossible de dire non 😇",
-      "Allez, clique sur Oui !",
-      "C'est écrit Oui d'avance !"
-    ];
-
-    // Direction tracker: false = move UP, true = move DOWN
-    let moveDown = false;
-    let dodgeCount = 0;
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initFromUrlParams();
-      renderTimeSlotsGrid();
-      setupFleeingButton();
-
-      // Input event bindings
-      document.getElementById('inputTargetName').addEventListener('input', (e) => state.targetName = e.target.value || "Merveille");
-      document.getElementById('inputSenderName').addEventListener('input', (e) => state.senderName = e.target.value || "Le garçon de DGC");
-      document.getElementById('inputActivity').addEventListener('input', (e) => state.activity = e.target.value || "Ciné");
-      document.getElementById('inputLocation').addEventListener('input', (e) => state.location = e.target.value || "Culture Park");
-      document.getElementById('inputDetail').addEventListener('input', (e) => state.detail = e.target.value);
-      document.getElementById('inputDate').addEventListener('input', (e) => state.date = e.target.value || "18 oct. 2026");
-    });
-
-    function goToStep(stepNumber) {
-      state.currentStep = stepNumber;
-
-      document.getElementById('step1View').classList.add('hidden');
-      document.getElementById('step2View').classList.add('hidden');
-      document.getElementById('step3View').classList.add('hidden');
-      document.getElementById('step4View').classList.add('hidden');
-
-      document.getElementById(`step${stepNumber}View`).classList.remove('hidden');
-
-      for (let i = 1; i <= 4; i++) {
-        const dash = document.getElementById(`dash${i}`);
-        if (i <= stepNumber) {
-          dash.classList.remove('bg-[#e2d9cc]');
-          dash.classList.add('bg-[#6b1124]');
-        } else {
-          dash.classList.remove('bg-[#6b1124]');
-          dash.classList.add('bg-[#e2d9cc]');
-        }
-      }
-
-      if (stepNumber === 4) {
-        generateShareableLinkAndQRCode();
-      }
-    }
-
-    function renderTimeSlotsGrid() {
-      const grid = document.getElementById('timeSlotsGrid');
-      grid.innerHTML = '';
-
-      DEFAULT_TIMES.forEach(time => {
-        const isSelected = state.availableTimes.includes(time);
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `py-2 px-3 border rounded-lg text-xs font-medium transition ${
-          isSelected ? 'time-slot-selected' : 'bg-[#f8f5ee] border-[#e2d9cc] text-gray-700 hover:border-[#6b1124]'
-        }`;
-        btn.textContent = time;
-        btn.onclick = () => toggleTimeSlot(time, btn);
-        grid.appendChild(btn);
-      });
-    }
-
-    function toggleTimeSlot(time, btnElement) {
-      if (state.availableTimes.includes(time)) {
-        if (state.availableTimes.length > 1) {
-          state.availableTimes = state.availableTimes.filter(t => t !== time);
-          btnElement.classList.remove('time-slot-selected');
-          btnElement.classList.add('bg-[#f8f5ee]', 'border-[#e2d9cc]', 'text-gray-700');
-        } else {
-          showToast("Garde au moins 1 horaire proposé !");
-        }
-      } else {
-        state.availableTimes.push(time);
-        btnElement.classList.add('time-slot-selected');
-        btnElement.classList.remove('bg-[#f8f5ee]', 'border-[#e2d9cc]', 'text-gray-700');
-      }
-    }
-
-    function generateShareableLinkAndQRCode() {
-      const baseUrl = window.location.origin + window.location.pathname;
-      const params = new URLSearchParams({
-        to: state.targetName,
-        from: state.senderName,
-        act: state.activity,
-        loc: state.location,
-        det: state.detail,
-        date: state.date,
-        times: state.availableTimes.join(',')
-      });
-
-      const fullUrl = `${baseUrl}?${params.toString()}`;
-      document.getElementById('shareableUrlInput').value = fullUrl;
-
-      // QR Code Generation using public API
-      const qrImg = document.getElementById('qrCodeImg');
-      const qrLoading = document.getElementById('qrLoading');
+      document.getElementById('inviteeNameDisplay').innerText = invitee;
+      document.getElementById('senderDisplay').querySelector('span').innerText = sender;
+      document.getElementById('emojiDisplay').innerText = emoji || '✨';
+      document.getElementById('headlineDisplay').innerText = title || 'Ça te dit une sortie ?';
+      document.getElementById('activityDisplay').innerText = activity || 'Sortie';
       
-      qrLoading.classList.remove('hidden');
+      if(locationParam) document.getElementById('locationDisplay').innerText = locationParam;
+      if(timeParam) document.getElementById('datetimeDisplay').innerText = timeParam;
+      
+      if(noteParam) {
+        document.getElementById('noteContainer').classList.remove('hidden');
+        document.getElementById('noteDisplay').innerText = noteParam;
+      }
 
-      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(fullUrl)}&color=6b1124&bgcolor=fcfaf7`;
+      // Logique du bouton "Non" alternatif (HAUT / BAS)
+      const noBtn = document.getElementById('noBtn');
+      let isUp = true;
+      const phrases = [
+        "Tu es sûre ?",
+        "Sérieusement ?",
+        "Un petit effort 🥺",
+        "Je paye mon coup !",
+        "Mauvaise touche !",
+        "Essaie encore 😜"
+      ];
+      let phraseIdx = 0;
 
-      qrImg.onload = () => {
-        qrLoading.classList.add('hidden');
-      };
+      function moveNoButton(e) {
+        if(e) e.preventDefault();
+        noBtn.innerText = phrases[phraseIdx % phrases.length];
+        phraseIdx++;
+        noBtn.style.transform = isUp ? 'translateY(-65px)' : 'translateY(65px)';
+        isUp = !isUp;
+      }
 
-      qrImg.onerror = () => {
-        qrLoading.textContent = "Erreur de chargement du QR code";
-      };
+      noBtn.addEventListener('click', moveNoButton);
+      noBtn.addEventListener('touchstart', moveNoButton);
 
-      qrImg.src = qrApiUrl;
-    }
-
-    function downloadQRCode() {
-      const qrImg = document.getElementById('qrCodeImg');
-      if (!qrImg.src) return;
-
-      fetch(qrImg.src)
-        .then(response => response.blob())
-        .then(blob => {
-          const blobUrl = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = `DisOui-QRCode-${state.targetName}.png`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(blobUrl);
-          showToast("Téléchargement du QR Code démarré !");
-        })
-        .catch(() => {
-          window.open(qrImg.src, '_blank');
-        });
-    }
-
-    function initFromUrlParams() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('to') || urlParams.has('act')) {
-        state.targetName = urlParams.get('to') || "Merveille";
-        state.senderName = urlParams.get('from') || "Le garçon de DGC";
-        state.activity = urlParams.get('act') || "Ciné";
-        state.location = urlParams.get('loc') || "Culture Park";
-        state.detail = urlParams.get('det') || "";
-        state.date = urlParams.get('date') || "18 oct. 2026";
+      // Action sur le bouton "Oui"
+      document.getElementById('yesBtn').addEventListener('click', () => {
+        document.getElementById('viewMode').classList.add('hidden');
+        document.getElementById('successMode').classList.remove('hidden');
         
-        const timesParam = urlParams.get('times');
-        if (timesParam) {
-          state.availableTimes = timesParam.split(',');
-        }
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
-        switchToReceiverView();
-      }
-    }
-
-    function switchToReceiverView() {
-      document.getElementById('creatorMode').classList.add('hidden');
-      document.getElementById('successMode').classList.add('hidden');
-      document.getElementById('receiverMode').classList.remove('hidden');
-      document.getElementById('stepDashes').classList.add('hidden');
-
-      document.getElementById('displayTargetHeader').textContent = `POUR TOI, ${state.targetName.toUpperCase()}`;
-      document.getElementById('displayQuestionTitle').textContent = `Ça te dit un ${state.activity.toLowerCase()} avec moi ?`;
-      document.getElementById('displayLocation').textContent = state.location;
-      document.getElementById('displayDate').textContent = state.date;
-
-      const detailRow = document.getElementById('detailRow');
-      if (state.detail) {
-        document.getElementById('displayDetail').textContent = state.detail;
-        detailRow.classList.remove('hidden');
-      } else {
-        detailRow.classList.add('hidden');
-      }
-
-      const timesContainer = document.getElementById('receiverTimesGrid');
-      timesContainer.innerHTML = '';
-      
-      state.selectedTime = state.availableTimes[0] || "14:00";
-
-      state.availableTimes.forEach((time, index) => {
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = `py-1 px-3 text-xs rounded-md border font-medium transition ${
-          index === 0 ? 'bg-[#6b1124] text-white border-[#6b1124]' : 'bg-white text-gray-700 border-[#e2d9cc] hover:border-[#6b1124]'
-        }`;
-        chip.textContent = time;
-        chip.onclick = () => {
-          state.selectedTime = time;
-          Array.from(timesContainer.children).forEach(c => {
-            c.className = 'py-1 px-3 text-xs rounded-md border font-medium transition bg-white text-gray-700 border-[#e2d9cc] hover:border-[#6b1124]';
-          });
-          chip.className = 'py-1 px-3 text-xs rounded-md border font-medium transition bg-[#6b1124] text-white border-[#6b1124]';
-        };
-        timesContainer.appendChild(chip);
+        const msg = encodeURIComponent(`Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`);
+        document.getElementById('whatsappConfirmBtn').href = `https://wa.me/?text=${msg}`;
       });
 
-      resetFleeingButton();
-    }
+    } else {
+      // ==========================================
+      // MODE 2 : CRÉATEUR D'INVITATION
+      // ==========================================
+      const categorySelect = document.getElementById('inputCategory');
+      const customGroup = document.getElementById('customActivityGroup');
 
-    function switchToCreatorView() {
-      document.getElementById('receiverMode').classList.add('hidden');
-      document.getElementById('successMode').classList.add('hidden');
-      document.getElementById('creatorMode').classList.remove('hidden');
-      document.getElementById('stepDashes').classList.remove('hidden');
-      goToStep(1);
-    }
-
-    function setupFleeingButton() {
-      const fleeBtn = document.getElementById('fleeBtn');
-
-      const triggerDodge = (e) => {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-
-        // Update button text and note
-        fleeBtn.innerText = DODGE_PHRASES[dodgeCount % DODGE_PHRASES.length];
-        document.getElementById('dodgeNote').innerText = DODGE_NOTES[dodgeCount % DODGE_NOTES.length];
-        dodgeCount++;
-
-        // Alternating logic: Move UP (-65px) on 1st click, DOWN (+65px) on 2nd, UP on 3rd...
-        if (!moveDown) {
-          // Move UP
-          fleeBtn.style.transform = 'translateY(-65px)';
-          moveDown = true;
+      categorySelect.addEventListener('change', () => {
+        if (categorySelect.value.startsWith('✨')) {
+          customGroup.classList.remove('hidden');
         } else {
-          // Move DOWN
-          fleeBtn.style.transform = 'translateY(65px)';
-          moveDown = false;
+          customGroup.classList.add('hidden');
         }
-      };
+      });
 
-      // Handle hover, click, and mobile touch
-      fleeBtn.addEventListener('mouseenter', triggerDodge);
-      fleeBtn.addEventListener('click', triggerDodge);
-      fleeBtn.addEventListener('touchstart', triggerDodge, { passive: false });
-    }
+      document.getElementById('inviteForm').addEventListener('submit', (e) => {
+        e.preventDefault();
 
-    function resetFleeingButton() {
-      const fleeBtn = document.getElementById('fleeBtn');
-      fleeBtn.style.transform = 'translateY(0px)';
-      fleeBtn.innerText = 'Non';
-      document.getElementById('dodgeNote').innerText = 'Tu es sûr-e...';
-      moveDown = false;
-      dodgeCount = 0;
-    }
+        const to = document.getElementById('inputInvitee').value;
+        const from = document.getElementById('inputSender').value;
+        const loc = document.getElementById('inputLocation').value || 'À définir ensemble';
+        const time = document.getElementById('inputDatetime').value || 'Prochainement';
+        const note = document.getElementById('inputNote').value;
 
-    function acceptInvitation() {
-      if (typeof confetti === 'function') {
-        const myConfetti = confetti.create(document.getElementById('confettiCanvas'), {
-          resize: true,
-          useWorker: true
-        });
+        let selected = categorySelect.value.split('|');
+        let emo = selected[0];
+        let act = selected[1];
+        let headline = selected[2];
 
-        myConfetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.6 },
-          colors: ['#6b1124', '#b88d4c', '#ffffff', '#e2d9cc']
-        });
+        if (categorySelect.value.startsWith('✨')) {
+          const customAct = document.getElementById('inputCustomActivity').value || 'Sortie';
+          act = customAct;
+          headline = `Ça te dit : ${customAct} ?`;
+        }
 
-        setTimeout(() => {
-          myConfetti({
-            particleCount: 80,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 }
-          });
-          myConfetti({
-            particleCount: 80,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 }
-          });
-        }, 200);
-      }
+        const baseUrl = window.location.href.split('?')[0];
+        const fullUrl = `${baseUrl}?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&act=${encodeURIComponent(act)}&emo=${encodeURIComponent(emo)}&title=${encodeURIComponent(headline)}&loc=${encodeURIComponent(loc)}&time=${encodeURIComponent(time)}${note ? '&note=' + encodeURIComponent(note) : ''}`;
 
-      document.getElementById('confirmSender').textContent = state.senderName;
-      document.getElementById('confirmTarget').textContent = state.targetName;
-      document.getElementById('confirmActivity').textContent = state.activity;
-      document.getElementById('confirmLocation').textContent = state.location;
-      document.getElementById('confirmDate').textContent = state.date;
-      document.getElementById('confirmTime').textContent = state.selectedTime;
+        document.getElementById('generatedUrl').value = fullUrl;
+        document.getElementById('generatedQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(fullUrl)}`;
+        document.getElementById('createdResult').classList.remove('hidden');
+      });
 
-      document.getElementById('receiverMode').classList.add('hidden');
-      document.getElementById('successMode').classList.remove('hidden');
-    }
-
-    function confirmOnWhatsApp() {
-      const text = `Coucou ${state.senderName} ! C'est bon pour le ${state.activity.toLowerCase()} à ${state.location} le ${state.date} vers ${state.selectedTime} ! 🍿✨`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    function shareViaWhatsApp() {
-      const url = document.getElementById('shareableUrlInput').value;
-      const text = `Coucou ${state.targetName} ! J'ai une invitation pour toi... 🍿👉 ${url}`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    function copyGeneratedLink() {
-      const input = document.getElementById('shareableUrlInput');
-      input.select();
-      document.execCommand('copy');
-      
-      const copyBtn = document.getElementById('copyBtn');
-      copyBtn.textContent = "Copié !";
-      copyBtn.classList.replace('bg-[#6b1124]', 'bg-green-600');
-
-      showToast("Lien d'invitation copié dans le presse-papier !");
-
-      setTimeout(() => {
-        copyBtn.textContent = "Copier";
-        copyBtn.classList.replace('bg-green-600', 'bg-[#6b1124]');
-      }, 2500);
-    }
-
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').textContent = message;
-      toast.classList.remove('opacity-0', 'pointer-events-none');
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 3000);
+      document.getElementById('copyBtn').addEventListener('click', () => {
+        const copyText = document.getElementById('generatedUrl');
+        copyText.select();
+        navigator.clipboard.writeText(copyText.value);
+        document.getElementById('copyBtn').innerText = 'Copié !';
+        setTimeout(() => document.getElementById('copyBtn').innerText = 'Copier', 2000);
+      });
     }
   </script>
 </body>
