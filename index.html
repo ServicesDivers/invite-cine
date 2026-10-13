@@ -18,7 +18,7 @@
   <div class="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[#E6DEC9] text-center max-w-md w-full relative overflow-hidden">
     
     <!-- ========================================== -->
-    <!-- VUE INVITÉ (S'affiche lorsqu'on ouvre le lien généré) -->
+    <!-- VUE INVITÉ (S'affiche via le lien unique) -->
     <!-- ========================================== -->
     <div id="viewMode" class="hidden">
       <div class="inline-block bg-[#A88B58]/10 text-[#A88B58] text-xs px-3 py-1 rounded-full font-medium mb-3 border border-[#A88B58]/20">
@@ -29,9 +29,17 @@
       <h1 id="headlineDisplay" class="text-3xl font-serif-custom text-[#5C1D24] font-bold mb-2">On se fait une sortie ?</h1>
       <p class="text-xs text-[#8C6D62] italic mb-6">(dire non ne sert à rien, mais tu peux essayer)</p>
 
-      <div class="bg-[#FAF8F5] p-4 rounded-xl border border-[#E6DEC9] mb-6 text-left text-sm space-y-2">
+      <div class="bg-[#FAF8F5] p-4 rounded-xl border border-[#E6DEC9] mb-6 text-left text-sm space-y-3">
         <p>✨ <strong>Activité :</strong> <span id="activityDisplay">Sortie</span></p>
-        <p>📍 <strong>Lieu :</strong> <span id="locationDisplay">À définir</span></p>
+        
+        <!-- Lieu avec Google Maps gratuit -->
+        <div>
+          <a id="mapsLink" href="#" target="_blank" class="flex items-center justify-between bg-white p-2.5 rounded-lg border border-[#E6DEC9] hover:bg-[#F7F4EF] transition text-xs">
+            <span>📍 <strong>Lieu :</strong> <span id="locationDisplay">À définir</span></span>
+            <span class="text-[#8C6D62] underline">Ouvrir Maps ↗</span>
+          </a>
+        </div>
+
         <p>📅 <strong>Quand :</strong> <span id="datetimeDisplay">À convenir</span></p>
         <p id="noteContainer" class="hidden italic text-xs text-[#8C6D62] pt-1">💬 <span id="noteDisplay"></span></p>
         <p id="senderDisplay" class="text-xs text-right text-[#8C6D62] pt-2 border-t border-[#E6DEC9]">Proposé par <span>...</span></p>
@@ -48,22 +56,28 @@
       </div>
     </div>
 
-    <!-- ÉCRAN DE CONFIRMATION (Après le clic sur Oui) -->
+    <!-- ÉCRAN DE CONFIRMATION AVEC CALENDRIER -->
     <div id="successMode" class="hidden">
       <div class="text-5xl mb-3">🎉🥳</div>
       <h2 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-2">Rendez-vous confirmé !</h2>
-      <p class="text-sm text-[#7D6B63] mb-6">C'est une excellente décision. Envoie-moi un message pour caler les derniers détails !</p>
-      <a id="whatsappConfirmBtn" href="#" target="_blank" class="inline-block bg-[#25D366] hover:bg-[#22bf5b] text-white font-medium py-3 px-6 rounded-lg shadow-md transition text-sm">
-        Prévenir sur WhatsApp 📲
-      </a>
+      <p class="text-sm text-[#7D6B63] mb-6">C'est une excellente décision. Ajoute l'événement à ton agenda et préviens-moi !</p>
+      
+      <div class="space-y-3">
+        <a id="gcalBtn" href="#" target="_blank" class="w-full block bg-white border border-[#5C1D24] text-[#5C1D24] hover:bg-[#FAF8F5] font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-sm">
+          📅 Ajouter à Google Calendar
+        </a>
+        <a id="whatsappConfirmBtn" href="#" target="_blank" class="w-full block bg-[#25D366] hover:bg-[#22bf5b] text-white font-medium py-3 px-4 rounded-lg shadow-md transition text-sm">
+          Prévenir sur WhatsApp 📲
+        </a>
+      </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- VUE CRÉATEUR (S'affiche par défaut sur la racine du site) -->
+    <!-- VUE CRÉATEUR (Formulaire) -->
     <!-- ========================================== -->
     <div id="createMode">
       <h1 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-1">Dis Oui 💌</h1>
-      <p class="text-xs text-[#8C6D62] mb-6">Crée une invitation personnalisée avec le bouton "Non" piège.</p>
+      <p class="text-xs text-[#8C6D62] mb-6">Crée ton invitation avec calendrier, Maps et bouton piège.</p>
 
       <form id="inviteForm" class="text-left space-y-3 text-xs">
         <div>
@@ -84,29 +98,35 @@
             <option value="🍹|Prendre un verre|On va boire un verre ?">🍹 Boire un verre</option>
             <option value="☕|Café & Balade|Un café & une balade ?">☕ Café & Balade</option>
             <option value="🥳|Soirée / Fête|Viens à ma soirée !">🥳 Soirée / Fête</option>
-            <option value=" bowling | Bowling / Jeu|Partie de Bowling ?">🎳 Bowling / Jeu</option>
+            <option value="🎳|Bowling / Jeu|Partie de Bowling ?">🎳 Bowling / Jeu</option>
             <option value="✨|Autre sortie|Une petite sortie ?">✨ Autre (Personnalisé)</option>
           </select>
         </div>
 
         <div id="customActivityGroup" class="hidden">
-          <label class="block font-medium mb-1">Nom de l'activité personnalisée :</label>
-          <input type="text" id="inputCustomActivity" placeholder="ex: Escalade, Musée, Concert..." class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          <label class="block font-medium mb-1">Nom de l'activité :</label>
+          <input type="text" id="inputCustomActivity" placeholder="ex: Escalade, Musée..." class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Lieu :</label>
-          <input type="text" id="inputLocation" placeholder="ex: Centre-ville, Chez moi, Pathé..." class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          <label class="block font-medium mb-1">Lieu (Nom du lieu ou adresse) :</label>
+          <input type="text" id="inputLocation" placeholder="ex: Pathé Bellecour, Lyon" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
         </div>
 
-        <div>
-          <label class="block font-medium mb-1">Date & Heure :</label>
-          <input type="text" id="inputDatetime" placeholder="ex: Ce vendredi à 20h00" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium mb-1">Date :</label>
+            <input type="date" id="inputDate" required class="w-full p-2 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Heure :</label>
+            <input type="time" id="inputTime" required class="w-full p-2 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          </div>
         </div>
 
         <div>
           <label class="block font-medium mb-1">Petit mot doux (optionnel) :</label>
-          <input type="text" id="inputNote" placeholder="ex: Je m'occupe de tout réserver !" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          <input type="text" id="inputNote" placeholder="ex: Je m'occupe de tout !" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
         </div>
 
         <button type="submit" class="w-full bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3 rounded-lg shadow-md transition text-sm mt-4">
@@ -114,16 +134,16 @@
         </button>
       </form>
 
-      <!-- Résultat avec lien et QR Code -->
+      <!-- Résultat -->
       <div id="createdResult" class="hidden mt-6 pt-6 border-t border-[#E6DEC9]">
-        <p class="text-xs text-green-700 font-semibold mb-2">✅ Lien prêt à être envoyé !</p>
+        <p class="text-xs text-green-700 font-semibold mb-2">✅ Lien prêt à être partagé !</p>
         <div class="flex items-center gap-2 mb-4">
           <input type="text" id="generatedUrl" readonly class="w-full p-2 text-xs border border-[#E6DEC9] rounded bg-gray-50">
           <button id="copyBtn" class="bg-[#5C1D24] text-white px-3 py-2 rounded text-xs font-medium">Copier</button>
         </div>
         <div class="text-center">
           <img id="generatedQr" src="" alt="QR Code" class="mx-auto w-28 h-28 p-1 bg-white border border-[#E6DEC9] rounded-lg mb-2 shadow-sm">
-          <p class="text-[10px] text-[#8C6D62]">Scanne ce QR code ou partage le lien par message.</p>
+          <p class="text-[10px] text-[#8C6D62]">Scanne ce QR code ou envoie le lien.</p>
         </div>
       </div>
     </div>
@@ -138,12 +158,10 @@
     const emoji = params.get('emo');
     const title = params.get('title');
     const locationParam = params.get('loc');
+    const dateParam = params.get('date');
     const timeParam = params.get('time');
     const noteParam = params.get('note');
 
-    // ==========================================
-    // MODE 1 : LECTURE DE L'INVITATION
-    // ==========================================
     if (invitee && sender) {
       document.getElementById('createMode').classList.add('hidden');
       document.getElementById('viewMode').classList.remove('hidden');
@@ -154,25 +172,29 @@
       document.getElementById('headlineDisplay').innerText = title || 'Ça te dit une sortie ?';
       document.getElementById('activityDisplay').innerText = activity || 'Sortie';
       
-      if(locationParam) document.getElementById('locationDisplay').innerText = locationParam;
-      if(timeParam) document.getElementById('datetimeDisplay').innerText = timeParam;
+      if(locationParam) {
+        document.getElementById('locationDisplay').innerText = locationParam;
+        document.getElementById('mapsLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationParam)}`;
+      }
+
+      let formattedDateTime = "À convenir";
+      if(dateParam) {
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const dateObj = new Date(dateParam + 'T00:00:00');
+        const dateFormatted = dateObj.toLocaleDateString('fr-FR', options);
+        formattedDateTime = timeParam ? `${dateFormatted} à ${timeParam}` : dateFormatted;
+      }
+      document.getElementById('datetimeDisplay').innerText = formattedDateTime;
       
       if(noteParam) {
         document.getElementById('noteContainer').classList.remove('hidden');
         document.getElementById('noteDisplay').innerText = noteParam;
       }
 
-      // Logique du bouton "Non" alternatif (HAUT / BAS)
+      // Bouton Non fuyant (Haut / Bas alterné)
       const noBtn = document.getElementById('noBtn');
       let isUp = true;
-      const phrases = [
-        "Tu es sûre ?",
-        "Sérieusement ?",
-        "Un petit effort 🥺",
-        "Je paye mon coup !",
-        "Mauvaise touche !",
-        "Essaie encore 😜"
-      ];
+      const phrases = ["Tu es sûre ?", "Sérieusement ?", "Un petit effort 🥺", "Je paye mon coup !", "Mauvaise touche !", "Essaie encore 😜"];
       let phraseIdx = 0;
 
       function moveNoButton(e) {
@@ -186,21 +208,36 @@
       noBtn.addEventListener('click', moveNoButton);
       noBtn.addEventListener('touchstart', moveNoButton);
 
-      // Action sur le bouton "Oui"
+      // Clic sur Oui
       document.getElementById('yesBtn').addEventListener('click', () => {
         document.getElementById('viewMode').classList.add('hidden');
         document.getElementById('successMode').classList.remove('hidden');
         
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
+        // Lien Google Calendar
+        if(dateParam) {
+          const cleanDate = dateParam.replace(/-/g, '');
+          const cleanTime = timeParam ? timeParam.replace(':', '') + '00' : '190000';
+          const startIso = `${cleanDate}T${cleanTime}`;
+          
+          const endDateObj = new Date(`${dateParam}T${timeParam || '19:00'}:00`);
+          endDateObj.setHours(endDateObj.getHours() + 2);
+          const endCleanDate = endDateObj.toISOString().slice(0,10).replace(/-/g, '');
+          const endCleanTime = endDateObj.toTimeString().slice(0,8).replace(/:/g, '');
+          const endIso = `${endCleanDate}T${endCleanTime}`;
+
+          const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activity + ' avec ' + sender)}&dates=${startIso}/${endIso}&details=${encodeURIComponent(noteParam || '')}&location=${encodeURIComponent(locationParam || '')}`;
+          document.getElementById('gcalBtn').href = gcalUrl;
+        } else {
+          document.getElementById('gcalBtn').style.display = 'none';
+        }
+
         const msg = encodeURIComponent(`Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`);
         document.getElementById('whatsappConfirmBtn').href = `https://wa.me/?text=${msg}`;
       });
 
     } else {
-      // ==========================================
-      // MODE 2 : CRÉATEUR D'INVITATION
-      // ==========================================
       const categorySelect = document.getElementById('inputCategory');
       const customGroup = document.getElementById('customActivityGroup');
 
@@ -217,8 +254,9 @@
 
         const to = document.getElementById('inputInvitee').value;
         const from = document.getElementById('inputSender').value;
-        const loc = document.getElementById('inputLocation').value || 'À définir ensemble';
-        const time = document.getElementById('inputDatetime').value || 'Prochainement';
+        const loc = document.getElementById('inputLocation').value || 'À définir';
+        const date = document.getElementById('inputDate').value;
+        const time = document.getElementById('inputTime').value;
         const note = document.getElementById('inputNote').value;
 
         let selected = categorySelect.value.split('|');
@@ -233,7 +271,8 @@
         }
 
         const baseUrl = window.location.href.split('?')[0];
-        const fullUrl = `${baseUrl}?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&act=${encodeURIComponent(act)}&emo=${encodeURIComponent(emo)}&title=${encodeURIComponent(headline)}&loc=${encodeURIComponent(loc)}&time=${encodeURIComponent(time)}${note ? '&note=' + encodeURIComponent(note) : ''}`;
+        let fullUrl = `${baseUrl}?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&act=${encodeURIComponent(act)}&emo=${encodeURIComponent(emo)}&title=${encodeURIComponent(headline)}&loc=${encodeURIComponent(loc)}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`;
+        if(note) fullUrl += `&note=${encodeURIComponent(note)}`;
 
         document.getElementById('generatedUrl').value = fullUrl;
         document.getElementById('generatedQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(fullUrl)}`;
