@@ -11,16 +11,16 @@
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F7F4EF; color: #4A3B32; -webkit-tap-highlight-color: transparent; }
     .font-serif-custom { font-family: 'EB Garamond', serif; }
     .btn-moving { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    /* Empêche le zoom automatique sur iOS lors du focus des inputs */
     input, select { font-size: 16px !important; }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 sm:p-6">
 
-  <div class="w-full max-w-md bg-white/95 backdrop-blur-md p-5 sm:p-8 rounded-3xl shadow-xl border border-[#E6DEC9] text-center relative overflow-hidden">
+  <!-- Suppression de overflow-hidden pour éviter la coupe des boutons -->
+  <div class="w-full max-w-md bg-white/95 backdrop-blur-md p-5 sm:p-8 pb-10 rounded-3xl shadow-xl border border-[#E6DEC9] text-center relative">
     
     <!-- ========================================== -->
-    <!-- VUE INVITÉ (S'affiche via le lien unique) -->
+    <!-- VUE INVITÉ -->
     <!-- ========================================== -->
     <div id="viewMode" class="hidden">
       <div class="inline-block bg-[#A88B58]/10 text-[#A88B58] text-xs px-3 py-1 rounded-full font-medium mb-3 border border-[#A88B58]/20 tracking-wider uppercase">
@@ -48,11 +48,12 @@
       </div>
 
       <!-- Boutons Oui / Non -->
-      <div class="flex items-center justify-center gap-3 relative min-h-[70px]">
+      <div class="flex items-center justify-center gap-3 relative min-h-[80px] my-2">
         <button id="yesBtn" class="flex-1 bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3.5 px-6 rounded-xl shadow-md transition text-base z-10 active:scale-95">
           Oui ! ✨
         </button>
-        <button id="noBtn" class="btn-moving flex-1 bg-white border border-[#5C1D24]/30 text-[#5C1D24] font-medium py-3.5 px-6 rounded-xl shadow-sm text-base active:scale-95">
+        <!-- Bouton Non bien visible avec fond blanc opaque et texte contrasté -->
+        <button id="noBtn" class="btn-moving flex-1 bg-white border-2 border-[#5C1D24]/40 text-[#5C1D24] font-semibold py-3.5 px-6 rounded-xl shadow-sm text-base active:scale-95 z-20">
           Non
         </button>
       </div>
@@ -94,7 +95,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- VUE CRÉATEUR (Formulaire aéré) -->
+    <!-- VUE CRÉATEUR -->
     <!-- ========================================== -->
     <div id="createMode">
       <h1 class="text-3xl font-serif-custom text-[#5C1D24] font-bold mb-1">Dis Oui 💌</h1>
@@ -108,7 +109,7 @@
 
         <div>
           <label class="block font-medium mb-1.5 text-[#4A3B32]">Ton prénom :</label>
-          <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-3.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
+          <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-3.5 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
         </div>
 
         <div class="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-3">
@@ -145,7 +146,6 @@
           <input type="text" id="inputLocation" placeholder="ex: Pathé Bellecour, Lyon" class="w-full p-3.5 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
         </div>
 
-        <!-- SECTION DATE ET HEURE AÉRÉE SUR MOBILES -->
         <div class="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-3">
           <div>
             <label class="block font-medium mb-1.5 text-[#4A3B32]">Date :</label>
@@ -226,7 +226,7 @@
         document.getElementById('noteDisplay').innerText = noteParam;
       }
 
-      // Bouton Non fuyant (Haut / Bas alterné)
+      // Bouton Non fuyant (Haut / Bas alterné avec amplitude contrôlée)
       const noBtn = document.getElementById('noBtn');
       let isUp = true;
       const phrases = ["Tu es sûre ?", "Sérieusement ?", "Un petit effort 🥺", "Je paye mon coup !", "Mauvaise touche !", "Essaie encore 😜"];
@@ -236,7 +236,7 @@
         if(e) e.preventDefault();
         noBtn.innerText = phrases[phraseIdx % phrases.length];
         phraseIdx++;
-        noBtn.style.transform = isUp ? 'translateY(-55px)' : 'translateY(55px)';
+        noBtn.style.transform = isUp ? 'translateY(-45px)' : 'translateY(45px)';
         isUp = !isUp;
       }
 
