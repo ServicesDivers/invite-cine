@@ -2,55 +2,57 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Dis Oui — Générateur d'Invitations</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F7F4EF; color: #4A3B32; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F7F4EF; color: #4A3B32; -webkit-tap-highlight-color: transparent; }
     .font-serif-custom { font-family: 'EB Garamond', serif; }
-    .btn-moving { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .btn-moving { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    /* Empêche le zoom auto sur iPhone lors du focus des inputs */
+    input, select { font-size: 16px !important; }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-6">
 
-  <div class="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[#E6DEC9] text-center max-w-md w-full relative overflow-hidden">
+  <div class="w-full max-w-md bg-white/95 backdrop-blur-md p-5 sm:p-8 rounded-3xl shadow-xl border border-[#E6DEC9] text-center relative overflow-hidden">
     
     <!-- ========================================== -->
     <!-- VUE INVITÉ (S'affiche via le lien unique) -->
     <!-- ========================================== -->
     <div id="viewMode" class="hidden">
-      <div class="inline-block bg-[#A88B58]/10 text-[#A88B58] text-xs px-3 py-1 rounded-full font-medium mb-3 border border-[#A88B58]/20">
-        POUR TOI, <span id="inviteeNameDisplay">...</span>
+      <div class="inline-block bg-[#A88B58]/10 text-[#A88B58] text-xs px-3 py-1 rounded-full font-medium mb-3 border border-[#A88B58]/20 tracking-wider uppercase">
+        Pour toi, <span id="inviteeNameDisplay">...</span>
       </div>
       
       <div id="emojiDisplay" class="text-5xl mb-2">✨</div>
-      <h1 id="headlineDisplay" class="text-3xl font-serif-custom text-[#5C1D24] font-bold mb-2">On se fait une sortie ?</h1>
+      <h1 id="headlineDisplay" class="text-3xl font-serif-custom text-[#5C1D24] font-bold mb-1">On se fait une sortie ?</h1>
       <p class="text-xs text-[#8C6D62] italic mb-6">(dire non ne sert à rien, mais tu peux essayer)</p>
 
-      <div class="bg-[#FAF8F5] p-4 rounded-xl border border-[#E6DEC9] mb-6 text-left text-sm space-y-3">
-        <p>✨ <strong>Activité :</strong> <span id="activityDisplay">Sortie</span></p>
+      <div class="bg-[#FAF8F5] p-4 rounded-2xl border border-[#E6DEC9] mb-6 text-left text-sm space-y-3 shadow-inner">
+        <p class="flex items-center gap-2">✨ <strong>Activité :</strong> <span id="activityDisplay" class="font-medium">Sortie</span></p>
         
         <!-- Lieu avec Google Maps -->
         <div>
-          <a id="mapsLink" href="#" target="_blank" class="flex items-center justify-between bg-white p-2.5 rounded-lg border border-[#E6DEC9] hover:bg-[#F7F4EF] transition text-xs">
-            <span>📍 <strong>Lieu :</strong> <span id="locationDisplay">À définir</span></span>
-            <span class="text-[#8C6D62] underline">Ouvrir Maps ↗</span>
+          <a id="mapsLink" href="#" target="_blank" class="flex items-center justify-between bg-white p-3 rounded-xl border border-[#E6DEC9] hover:bg-[#FAF8F5] transition text-xs shadow-sm">
+            <span class="truncate pr-2">📍 <strong>Lieu :</strong> <span id="locationDisplay">À définir</span></span>
+            <span class="text-[#8C6D62] underline shrink-0 font-medium">Maps ↗</span>
           </a>
         </div>
 
-        <p>📅 <strong>Quand :</strong> <span id="datetimeDisplay">À convenir</span></p>
-        <p id="noteContainer" class="hidden italic text-xs text-[#8C6D62] pt-1">💬 <span id="noteDisplay"></span></p>
-        <p id="senderDisplay" class="text-xs text-right text-[#8C6D62] pt-2 border-t border-[#E6DEC9]">Proposé par <span>...</span></p>
+        <p class="flex items-center gap-2">📅 <strong>Quand :</strong> <span id="datetimeDisplay" class="font-medium">À convenir</span></p>
+        <p id="noteContainer" class="hidden italic text-xs text-[#8C6D62] pt-1 border-t border-[#E6DEC9]">💬 <span id="noteDisplay"></span></p>
+        <p id="senderDisplay" class="text-xs text-right text-[#8C6D62] pt-2 border-t border-[#E6DEC9]">Proposé par <span class="font-semibold">...</span></p>
       </div>
 
       <!-- Boutons Oui / Non -->
-      <div class="flex items-center justify-center gap-4 relative min-h-[70px]">
-        <button id="yesBtn" class="bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3 px-8 rounded-lg shadow-md transition text-base z-10">
+      <div class="flex items-center justify-center gap-3 relative min-h-[70px]">
+        <button id="yesBtn" class="flex-1 bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3.5 px-6 rounded-xl shadow-md transition text-base z-10 active:scale-95">
           Oui ! ✨
         </button>
-        <button id="noBtn" class="btn-moving bg-white border border-[#5C1D24]/30 text-[#5C1D24] font-medium py-3 px-6 rounded-lg shadow-sm text-base">
+        <button id="noBtn" class="btn-moving flex-1 bg-white border border-[#5C1D24]/30 text-[#5C1D24] font-medium py-3.5 px-6 rounded-xl shadow-sm text-base active:scale-95">
           Non
         </button>
       </div>
@@ -63,66 +65,66 @@
       <p class="text-xs text-[#7D6B63] mb-4">Choisis comment tu veux me prévenir :</p>
       
       <!-- Agenda -->
-      <a id="gcalBtn" href="#" target="_blank" class="w-full block bg-[#FAF8F5] border border-[#E6DEC9] text-[#5C1D24] hover:bg-white font-medium py-2 px-3 rounded-lg text-xs mb-4">
-        📅 Ajouter à ton Google Calendar
+      <a id="gcalBtn" href="#" target="_blank" class="w-full block bg-[#FAF8F5] border border-[#E6DEC9] text-[#5C1D24] hover:bg-white font-medium py-3 px-4 rounded-xl text-xs mb-4 shadow-sm transition">
+        📅 Ajouter à Google Calendar
       </a>
 
-      <!-- Reseaux Sociaux -->
-      <div class="space-y-2">
-        <a id="whatsappBtn" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
+      <!-- Réseaux Sociaux -->
+      <div class="space-y-2.5">
+        <a id="whatsappBtn" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium py-3 px-4 rounded-xl shadow-sm transition text-xs">
           <span>📲 WhatsApp</span>
         </a>
 
-        <a id="smsBtn" href="#" class="w-full flex items-center justify-center gap-2 bg-[#34C759] hover:bg-[#2eb14f] text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
+        <a id="smsBtn" href="#" class="w-full flex items-center justify-center gap-2 bg-[#34C759] hover:bg-[#2eb14f] text-white font-medium py-3 px-4 rounded-xl shadow-sm transition text-xs">
           <span>💬 SMS</span>
         </a>
 
-        <button id="instaBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
-          <span>📸 Instagram (Copier le message & ouvrir le profil)</span>
+        <button id="instaBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white font-medium py-3 px-4 rounded-xl shadow-sm transition text-xs">
+          <span>📸 Instagram (Copier & Ouvrir)</span>
         </button>
 
-        <button id="snapBtn" class="w-full flex items-center justify-center gap-2 bg-[#FFFC00] text-black font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
-          <span>👻 Snapchat (Copier le message & ouvrir Snapchat)</span>
+        <button id="snapBtn" class="w-full flex items-center justify-center gap-2 bg-[#FFFC00] text-black font-medium py-3 px-4 rounded-xl shadow-sm transition text-xs">
+          <span>👻 Snapchat (Copier & Ouvrir)</span>
         </button>
       </div>
       
-      <p id="copyAlert" class="hidden text-[11px] text-green-700 font-medium mt-3 bg-green-50 p-2 rounded-md border border-green-200">
+      <p id="copyAlert" class="hidden text-[11px] text-green-700 font-medium mt-3 bg-green-50 p-2.5 rounded-xl border border-green-200">
         📋 Message copié ! Colle-le dans la discussion.
       </p>
     </div>
 
     <!-- ========================================== -->
-    <!-- VUE CRÉATEUR (Formulaire) -->
+    <!-- VUE CRÉATEUR (Formulaire mobile-friendly) -->
     <!-- ========================================== -->
     <div id="createMode">
-      <h1 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-1">Dis Oui 💌</h1>
-      <p class="text-xs text-[#8C6D62] mb-6">Crée ton invitation personnalisée et autonome.</p>
+      <h1 class="text-3xl font-serif-custom text-[#5C1D24] font-bold mb-1">Dis Oui 💌</h1>
+      <p class="text-xs text-[#8C6D62] mb-5">Crée ton invitation interactive en quelques secondes.</p>
 
-      <form id="inviteForm" class="text-left space-y-3 text-xs">
+      <form id="inviteForm" class="text-left space-y-3.5 text-xs">
         <div>
-          <label class="block font-medium mb-1">Son prénom / surnom :</label>
-          <input type="text" id="inputInvitee" required placeholder="ex: Sarah" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          <label class="block font-medium mb-1 text-[#4A3B32]">Son prénom / surnom :</label>
+          <input type="text" id="inputInvitee" required placeholder="ex: Sarah" class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Ton prénom :</label>
-          <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          <label class="block font-medium mb-1 text-[#4A3B32]">Ton prénom :</label>
+          <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-medium mb-1">Ton Pseudo Instagram :</label>
-            <input type="text" id="inputInsta" placeholder="ex: alex_off" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+            <label class="block font-medium mb-1 text-[#4A3B32]">Insta (optionnel) :</label>
+            <input type="text" id="inputInsta" placeholder="ex: alex_ig" class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
           </div>
           <div>
-            <label class="block font-medium mb-1">Ton Pseudo Snapchat :</label>
-            <input type="text" id="inputSnap" placeholder="ex: alex_snap" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+            <label class="block font-medium mb-1 text-[#4A3B32]">Snap (optionnel) :</label>
+            <input type="text" id="inputSnap" placeholder="ex: alex_snap" class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
           </div>
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Type d'activité :</label>
-          <select id="inputCategory" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5] font-medium">
+          <label class="block font-medium mb-1 text-[#4A3B32]">Type d'activité :</label>
+          <select id="inputCategory" class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] font-medium focus:outline-none focus:border-[#5C1D24]">
             <option value="🍿|Cinéma|Ça te dit un ciné ?">🍿 Cinéma</option>
             <option value="🍷|Restaurant / Dîner|On se fait un resto ?">🍷 Restaurant / Dîner</option>
             <option value="🍹|Prendre un verre|On va boire un verre ?">🍹 Boire un verre</option>
@@ -134,46 +136,46 @@
         </div>
 
         <div id="customActivityGroup" class="hidden">
-          <label class="block font-medium mb-1">Nom de l'activité :</label>
-          <input type="text" id="inputCustomActivity" placeholder="ex: Escalade, Musée..." class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          <label class="block font-medium mb-1 text-[#4A3B32]">Nom de l'activité :</label>
+          <input type="text" id="inputCustomActivity" placeholder="ex: Escalade, Musée..." class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Lieu (Nom ou adresse) :</label>
-          <input type="text" id="inputLocation" placeholder="ex: Pathé Bellecour, Lyon" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          <label class="block font-medium mb-1 text-[#4A3B32]">Lieu (Nom ou adresse) :</label>
+          <input type="text" id="inputLocation" placeholder="ex: Pathé Bellecour, Lyon" class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-medium mb-1">Date :</label>
-            <input type="date" id="inputDate" required class="w-full p-2 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+            <label class="block font-medium mb-1 text-[#4A3B32]">Date :</label>
+            <input type="date" id="inputDate" required class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
           </div>
           <div>
-            <label class="block font-medium mb-1">Heure :</label>
-            <input type="time" id="inputTime" required class="w-full p-2 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+            <label class="block font-medium mb-1 text-[#4A3B32]">Heure :</label>
+            <input type="time" id="inputTime" required class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
           </div>
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Petit mot doux (optionnel) :</label>
-          <input type="text" id="inputNote" placeholder="ex: Je m'occupe de tout !" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          <label class="block font-medium mb-1 text-[#4A3B32]">Petit mot doux (optionnel) :</label>
+          <input type="text" id="inputNote" placeholder="ex: Je m'occupe de tout !" class="w-full p-3 border border-[#E6DEC9] rounded-xl bg-[#FAF8F5] focus:outline-none focus:border-[#5C1D24]">
         </div>
 
-        <button type="submit" class="w-full bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3 rounded-lg shadow-md transition text-sm mt-4">
+        <button type="submit" class="w-full bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3.5 rounded-xl shadow-md transition text-sm mt-5 active:scale-95">
           Générer mon invitation 🚀
         </button>
       </form>
 
       <!-- Résultat -->
-      <div id="createdResult" class="hidden mt-6 pt-6 border-t border-[#E6DEC9]">
+      <div id="createdResult" class="hidden mt-6 pt-5 border-t border-[#E6DEC9]">
         <p class="text-xs text-green-700 font-semibold mb-2">✅ Lien prêt à être partagé !</p>
         <div class="flex items-center gap-2 mb-4">
-          <input type="text" id="generatedUrl" readonly class="w-full p-2 text-xs border border-[#E6DEC9] rounded bg-gray-50">
-          <button id="copyBtn" class="bg-[#5C1D24] text-white px-3 py-2 rounded text-xs font-medium">Copier</button>
+          <input type="text" id="generatedUrl" readonly class="w-full p-2.5 text-xs border border-[#E6DEC9] rounded-xl bg-gray-50 focus:outline-none">
+          <button id="copyBtn" class="bg-[#5C1D24] text-white px-4 py-2.5 rounded-xl text-xs font-medium shrink-0 active:scale-95">Copier</button>
         </div>
         <div class="text-center">
-          <img id="generatedQr" src="" alt="QR Code" class="mx-auto w-28 h-28 p-1 bg-white border border-[#E6DEC9] rounded-lg mb-2 shadow-sm">
-          <p class="text-[10px] text-[#8C6D62]">Scanne ce QR code ou envoie le lien.</p>
+          <img id="generatedQr" src="" alt="QR Code" class="mx-auto w-32 h-32 p-1.5 bg-white border border-[#E6DEC9] rounded-2xl mb-2 shadow-sm">
+          <p class="text-[10px] text-[#8C6D62]">Scanne ce QR code ou envoie le lien par message.</p>
         </div>
       </div>
     </div>
@@ -223,7 +225,7 @@
         document.getElementById('noteDisplay').innerText = noteParam;
       }
 
-      // Bouton Non fuyant
+      // Bouton Non fuyant (Haut / Bas alterné)
       const noBtn = document.getElementById('noBtn');
       let isUp = true;
       const phrases = ["Tu es sûre ?", "Sérieusement ?", "Un petit effort 🥺", "Je paye mon coup !", "Mauvaise touche !", "Essaie encore 😜"];
@@ -233,7 +235,7 @@
         if(e) e.preventDefault();
         noBtn.innerText = phrases[phraseIdx % phrases.length];
         phraseIdx++;
-        noBtn.style.transform = isUp ? 'translateY(-65px)' : 'translateY(65px)';
+        noBtn.style.transform = isUp ? 'translateY(-55px)' : 'translateY(55px)';
         isUp = !isUp;
       }
 
