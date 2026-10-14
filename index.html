@@ -32,7 +32,7 @@
       <div class="bg-[#FAF8F5] p-4 rounded-xl border border-[#E6DEC9] mb-6 text-left text-sm space-y-3">
         <p>✨ <strong>Activité :</strong> <span id="activityDisplay">Sortie</span></p>
         
-        <!-- Lieu avec Google Maps gratuit -->
+        <!-- Lieu avec Google Maps -->
         <div>
           <a id="mapsLink" href="#" target="_blank" class="flex items-center justify-between bg-white p-2.5 rounded-lg border border-[#E6DEC9] hover:bg-[#F7F4EF] transition text-xs">
             <span>📍 <strong>Lieu :</strong> <span id="locationDisplay">À définir</span></span>
@@ -56,38 +56,38 @@
       </div>
     </div>
 
-    <!-- ÉCRAN DE CONFIRMATION AVEC CHOIX DU RÉSEAU -->
+    <!-- ÉCRAN DE CONFIRMATION -->
     <div id="successMode" class="hidden">
       <div class="text-5xl mb-3">🎉🥳</div>
       <h2 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-1">Rendez-vous confirmé !</h2>
-      <p class="text-xs text-[#7D6B63] mb-4">Choisis comment tu veux prévenir ton ami.e :</p>
+      <p class="text-xs text-[#7D6B63] mb-4">Choisis comment tu veux me prévenir :</p>
       
-      <!-- Bouton Agenda -->
+      <!-- Agenda -->
       <a id="gcalBtn" href="#" target="_blank" class="w-full block bg-[#FAF8F5] border border-[#E6DEC9] text-[#5C1D24] hover:bg-white font-medium py-2 px-3 rounded-lg text-xs mb-4">
         📅 Ajouter à ton Google Calendar
       </a>
 
-      <!-- Choix du réseau social -->
+      <!-- Reseaux Sociaux -->
       <div class="space-y-2">
         <a id="whatsappBtn" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
-          <span>📲 Envoyer sur WhatsApp</span>
+          <span>📲 WhatsApp</span>
         </a>
 
         <a id="smsBtn" href="#" class="w-full flex items-center justify-center gap-2 bg-[#34C759] hover:bg-[#2eb14f] text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
-          <span>💬 Envoyer par SMS</span>
+          <span>💬 SMS</span>
         </a>
 
         <button id="instaBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
-          <span>📸 Répondre sur Instagram (Copier le message)</span>
+          <span>📸 Instagram (Copier le message & ouvrir le profil)</span>
         </button>
 
         <button id="snapBtn" class="w-full flex items-center justify-center gap-2 bg-[#FFFC00] text-black font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
-          <span>👻 Répondre sur Snapchat (Copier le message)</span>
+          <span>👻 Snapchat (Copier le message & ouvrir Snapchat)</span>
         </button>
       </div>
       
       <p id="copyAlert" class="hidden text-[11px] text-green-700 font-medium mt-3 bg-green-50 p-2 rounded-md border border-green-200">
-        📋 Message copié ! Ouvre l'application pour le coller.
+        📋 Message copié ! Colle-le dans la discussion.
       </p>
     </div>
 
@@ -96,7 +96,7 @@
     <!-- ========================================== -->
     <div id="createMode">
       <h1 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-1">Dis Oui 💌</h1>
-      <p class="text-xs text-[#8C6D62] mb-6">Crée ton invitation avec choix du réseau, Maps et bouton piège.</p>
+      <p class="text-xs text-[#8C6D62] mb-6">Crée ton invitation personnalisée et autonome.</p>
 
       <form id="inviteForm" class="text-left space-y-3 text-xs">
         <div>
@@ -107,6 +107,17 @@
         <div>
           <label class="block font-medium mb-1">Ton prénom :</label>
           <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium mb-1">Ton Pseudo Instagram :</label>
+            <input type="text" id="inputInsta" placeholder="ex: alex_off" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Ton Pseudo Snapchat :</label>
+            <input type="text" id="inputSnap" placeholder="ex: alex_snap" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
+          </div>
         </div>
 
         <div>
@@ -128,7 +139,7 @@
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Lieu (Nom du lieu ou adresse) :</label>
+          <label class="block font-medium mb-1">Lieu (Nom ou adresse) :</label>
           <input type="text" id="inputLocation" placeholder="ex: Pathé Bellecour, Lyon" class="w-full p-2.5 border border-[#E6DEC9] rounded-lg bg-[#FAF8F5]">
         </div>
 
@@ -180,6 +191,8 @@
     const dateParam = params.get('date');
     const timeParam = params.get('time');
     const noteParam = params.get('note');
+    const instaParam = params.get('ig');
+    const snapParam = params.get('sc');
 
     if (invitee && sender) {
       document.getElementById('createMode').classList.add('hidden');
@@ -210,7 +223,7 @@
         document.getElementById('noteDisplay').innerText = noteParam;
       }
 
-      // Bouton Non fuyant (Haut / Bas alterné)
+      // Bouton Non fuyant
       const noBtn = document.getElementById('noBtn');
       let isUp = true;
       const phrases = ["Tu es sûre ?", "Sérieusement ?", "Un petit effort 🥺", "Je paye mon coup !", "Mauvaise touche !", "Essaie encore 😜"];
@@ -237,31 +250,31 @@
         const confirmMsg = `Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`;
         const encodedMsg = encodeURIComponent(confirmMsg);
 
-        // Configurer WhatsApp et SMS
         document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodedMsg}`;
         document.getElementById('smsBtn').href = `sms:?body=${encodedMsg}`;
 
-        // Configurer Instagram / Snapchat (Copie du message)
         const copyAlert = document.getElementById('copyAlert');
         
-        function handleSocialCopy(appUrl) {
+        function handleSocialCopy(profileUrl) {
           navigator.clipboard.writeText(confirmMsg).then(() => {
             copyAlert.classList.remove('hidden');
             setTimeout(() => {
-              window.location.href = appUrl;
-            }, 1200);
+              window.open(profileUrl, '_blank');
+            }, 1000);
           });
         }
 
         document.getElementById('instaBtn').addEventListener('click', () => {
-          handleSocialCopy('instagram://');
+          const instaUrl = instaParam ? `https://instagram.com/${instaParam.replace('@','')}` : 'https://instagram.com';
+          handleSocialCopy(instaUrl);
         });
 
         document.getElementById('snapBtn').addEventListener('click', () => {
-          handleSocialCopy('snapchat://');
+          const snapUrl = snapParam ? `https://snapchat.com/add/${snapParam.replace('@','')}` : 'https://snapchat.com';
+          handleSocialCopy(snapUrl);
         });
 
-        // Lien Google Calendar
+        // Google Calendar
         if(dateParam) {
           const cleanDate = dateParam.replace(/-/g, '');
           const cleanTime = timeParam ? timeParam.replace(':', '') + '00' : '190000';
@@ -297,6 +310,8 @@
 
         const to = document.getElementById('inputInvitee').value;
         const from = document.getElementById('inputSender').value;
+        const insta = document.getElementById('inputInsta').value;
+        const snap = document.getElementById('inputSnap').value;
         const loc = document.getElementById('inputLocation').value || 'À définir';
         const date = document.getElementById('inputDate').value;
         const time = document.getElementById('inputTime').value;
@@ -316,6 +331,8 @@
         const baseUrl = window.location.href.split('?')[0];
         let fullUrl = `${baseUrl}?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&act=${encodeURIComponent(act)}&emo=${encodeURIComponent(emo)}&title=${encodeURIComponent(headline)}&loc=${encodeURIComponent(loc)}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`;
         if(note) fullUrl += `&note=${encodeURIComponent(note)}`;
+        if(insta) fullUrl += `&ig=${encodeURIComponent(insta)}`;
+        if(snap) fullUrl += `&sc=${encodeURIComponent(snap)}`;
 
         document.getElementById('generatedUrl').value = fullUrl;
         document.getElementById('generatedQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(fullUrl)}`;
