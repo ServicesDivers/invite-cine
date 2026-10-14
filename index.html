@@ -56,20 +56,39 @@
       </div>
     </div>
 
-    <!-- ÉCRAN DE CONFIRMATION AVEC CALENDRIER -->
+    <!-- ÉCRAN DE CONFIRMATION AVEC CHOIX DU RÉSEAU -->
     <div id="successMode" class="hidden">
       <div class="text-5xl mb-3">🎉🥳</div>
-      <h2 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-2">Rendez-vous confirmé !</h2>
-      <p class="text-sm text-[#7D6B63] mb-6">C'est une excellente décision. Ajoute l'événement à ton agenda et préviens-moi !</p>
+      <h2 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-1">Rendez-vous confirmé !</h2>
+      <p class="text-xs text-[#7D6B63] mb-4">Choisis comment tu veux prévenir ton ami.e :</p>
       
-      <div class="space-y-3">
-        <a id="gcalBtn" href="#" target="_blank" class="w-full block bg-white border border-[#5C1D24] text-[#5C1D24] hover:bg-[#FAF8F5] font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-sm">
-          📅 Ajouter à Google Calendar
+      <!-- Bouton Agenda -->
+      <a id="gcalBtn" href="#" target="_blank" class="w-full block bg-[#FAF8F5] border border-[#E6DEC9] text-[#5C1D24] hover:bg-white font-medium py-2 px-3 rounded-lg text-xs mb-4">
+        📅 Ajouter à ton Google Calendar
+      </a>
+
+      <!-- Choix du réseau social -->
+      <div class="space-y-2">
+        <a id="whatsappBtn" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
+          <span>📲 Envoyer sur WhatsApp</span>
         </a>
-        <a id="whatsappConfirmBtn" href="#" target="_blank" class="w-full block bg-[#25D366] hover:bg-[#22bf5b] text-white font-medium py-3 px-4 rounded-lg shadow-md transition text-sm">
-          Prévenir sur WhatsApp 📲
+
+        <a id="smsBtn" href="#" class="w-full flex items-center justify-center gap-2 bg-[#34C759] hover:bg-[#2eb14f] text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
+          <span>💬 Envoyer par SMS</span>
         </a>
+
+        <button id="instaBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
+          <span>📸 Répondre sur Instagram (Copier le message)</span>
+        </button>
+
+        <button id="snapBtn" class="w-full flex items-center justify-center gap-2 bg-[#FFFC00] text-black font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-xs">
+          <span>👻 Répondre sur Snapchat (Copier le message)</span>
+        </button>
       </div>
+      
+      <p id="copyAlert" class="hidden text-[11px] text-green-700 font-medium mt-3 bg-green-50 p-2 rounded-md border border-green-200">
+        📋 Message copié ! Ouvre l'application pour le coller.
+      </p>
     </div>
 
     <!-- ========================================== -->
@@ -77,7 +96,7 @@
     <!-- ========================================== -->
     <div id="createMode">
       <h1 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-1">Dis Oui 💌</h1>
-      <p class="text-xs text-[#8C6D62] mb-6">Crée ton invitation avec calendrier, Maps et bouton piège.</p>
+      <p class="text-xs text-[#8C6D62] mb-6">Crée ton invitation avec choix du réseau, Maps et bouton piège.</p>
 
       <form id="inviteForm" class="text-left space-y-3 text-xs">
         <div>
@@ -215,6 +234,33 @@
         
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
+        const confirmMsg = `Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`;
+        const encodedMsg = encodeURIComponent(confirmMsg);
+
+        // Configurer WhatsApp et SMS
+        document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodedMsg}`;
+        document.getElementById('smsBtn').href = `sms:?body=${encodedMsg}`;
+
+        // Configurer Instagram / Snapchat (Copie du message)
+        const copyAlert = document.getElementById('copyAlert');
+        
+        function handleSocialCopy(appUrl) {
+          navigator.clipboard.writeText(confirmMsg).then(() => {
+            copyAlert.classList.remove('hidden');
+            setTimeout(() => {
+              window.location.href = appUrl;
+            }, 1200);
+          });
+        }
+
+        document.getElementById('instaBtn').addEventListener('click', () => {
+          handleSocialCopy('instagram://');
+        });
+
+        document.getElementById('snapBtn').addEventListener('click', () => {
+          handleSocialCopy('snapchat://');
+        });
+
         // Lien Google Calendar
         if(dateParam) {
           const cleanDate = dateParam.replace(/-/g, '');
@@ -232,9 +278,6 @@
         } else {
           document.getElementById('gcalBtn').style.display = 'none';
         }
-
-        const msg = encodeURIComponent(`Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`);
-        document.getElementById('whatsappConfirmBtn').href = `https://wa.me/?text=${msg}`;
       });
 
     } else {
