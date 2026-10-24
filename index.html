@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dis Oui — Générateur d'Invitations</title>
+  <title>Dis Oui — Crée ton invitation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@
       </div>
     </div>
 
-    <!-- ÉCRAN DE CONFIRMATION -->
+    <!-- ÉCRAN DE CONFIRMATION AVEC BOUTON DE CRÉATION -->
     <div id="successMode" class="hidden">
       <div class="text-5xl mb-3">🎉🥳</div>
       <h2 class="text-2xl font-serif-custom text-[#5C1D24] font-bold mb-1">Rendez-vous confirmé !</h2>
@@ -84,6 +84,13 @@
       <p id="copyAlert" class="hidden text-[11px] text-green-700 font-medium mt-3 bg-green-50 p-2.5 rounded-xl border border-green-200">
         📋 Message copié ! Colle-le dans la discussion.
       </p>
+
+      <!-- BOUTON POUR LE RECEVEUR -->
+      <div class="mt-6 pt-5 border-t border-[#E6DEC9]">
+        <a href="./" class="w-full block bg-[#5C1D24] hover:bg-[#732630] text-white font-medium py-3.5 px-4 rounded-xl shadow-md transition text-xs flex items-center justify-center gap-2 active:scale-95">
+          <span>✨ Toi aussi, crée ton invitation gratuite !</span>
+        </a>
+      </div>
     </div>
 
     <!-- VUE CRÉATEUR -->
@@ -157,7 +164,7 @@
         </button>
       </form>
 
-      <!-- RÉSULTAT AVEC BOUTON TÉLÉCHARGER LE QR CODE -->
+      <!-- RÉSULTAT -->
       <div id="createdResult" class="hidden mt-6 pt-5 border-t border-[#E6DEC9]">
         <p class="text-xs text-green-700 font-semibold mb-2">✅ Lien prêt à être partagé !</p>
         <div class="flex items-center gap-2 mb-4">
@@ -167,7 +174,6 @@
         <div class="text-center">
           <img id="generatedQr" src="" alt="QR Code" class="mx-auto w-32 h-32 p-1.5 bg-white border border-[#E6DEC9] rounded-2xl mb-3 shadow-sm">
           
-          <!-- BOUTON DE TÉLÉCHARGEMENT DU QR CODE -->
           <button id="downloadQrBtn" class="w-full bg-[#FAF8F5] border border-[#5C1D24]/30 hover:border-[#5C1D24] text-[#5C1D24] font-medium py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
             <span>📥 Télécharger l'image du QR Code</span>
           </button>
@@ -344,7 +350,6 @@
         setTimeout(() => document.getElementById('copyBtn').innerText = 'Copier', 2000);
       });
 
-      // LOGIQUE DE TÉLÉCHARGEMENT DU QR CODE
       document.getElementById('downloadQrBtn').addEventListener('click', async () => {
         const qrUrl = document.getElementById('generatedQr').src;
         try {
