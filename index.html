@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dis Oui — Invitations Interactives</title>
+  <title>InviteLover — Dis Oui</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s ease; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s ease; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
     .btn-moving { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
     input, select { font-size: 16px !important; }
     
@@ -17,12 +17,36 @@
     body.theme-flirt { background: linear-gradient(135deg, #4c1d95, #831843, #581c87); color: #fdf2f8; }
     body.theme-love { background: linear-gradient(135deg, #881337, #9f1239, #4c0519); color: #fff1f2; }
     body.theme-default { background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042); color: #f8fafc; }
+
+    /* ANIMATION DU CHAT */
+    @keyframes walk {
+      0% { transform: translateX(-50px) scaleX(1); }
+      49.9% { transform: translateX(calc(100vw - 50px)) scaleX(1); }
+      50% { transform: translateX(calc(100vw - 50px)) scaleX(-1); }
+      99.9% { transform: translateX(-50px) scaleX(-1); }
+      100% { transform: translateX(-50px) scaleX(1); }
+    }
+    .animated-cat {
+      position: fixed;
+      bottom: 8px;
+      left: 0;
+      font-size: 28px;
+      animation: walk 16s infinite linear;
+      z-index: 99;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body class="theme-default min-h-screen flex items-center justify-center p-3 sm:p-6">
 
-  <div id="mainCard" class="w-full max-w-md bg-slate-900/90 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative overflow-hidden transition-all duration-500">
+  <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative overflow-hidden transition-all duration-500">
     
+    <!-- LOGO DE LA PLATEFORME -->
+    <div class="flex items-center justify-center gap-2 mb-4 pb-3 border-b border-white/10">
+      <span class="text-xl">💌</span>
+      <span class="font-extrabold text-xs tracking-widest uppercase opacity-90 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-300">InviteLover</span>
+    </div>
+
     <!-- ========================================== -->
     <!-- VUE INVITÉ -->
     <!-- ========================================== -->
@@ -31,7 +55,7 @@
         Pour toi, <span id="inviteeNameDisplay">...</span>
       </div>
       
-      <div id="emojiDisplay" class="text-6xl mb-2 animate-bounce">✨</div>
+      <div id="emojiDisplay" class="text-5xl mb-2 animate-bounce">✨</div>
       <h1 id="headlineDisplay" class="text-2xl font-extrabold text-white mb-1">On se fait une sortie ?</h1>
       <p id="subHeadlineDisplay" class="text-xs text-white/70 italic mb-6">(dire non ne sert à rien, mais tu peux essayer)</p>
 
@@ -62,7 +86,7 @@
 
     <!-- ÉCRAN DE CONFIRMATION -->
     <div id="successMode" class="hidden">
-      <div class="text-6xl mb-3">🎉🥳</div>
+      <div class="text-5xl mb-3">🎉🥳</div>
       <h2 class="text-2xl font-extrabold text-white mb-1">Rendez-vous confirmé !</h2>
       <p class="text-xs text-white/80 mb-4">Choisis comment tu veux me répondre :</p>
       
@@ -105,7 +129,6 @@
 
       <form id="inviteForm" class="text-left space-y-3.5 text-xs">
         
-        <!-- SÉLECTION DU LIEN / VIBE -->
         <div>
           <label class="block font-semibold mb-1 text-pink-300">👥 Quel est votre lien ?</label>
           <select id="inputRelation" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800 text-white font-semibold focus:outline-none focus:border-pink-500">
@@ -162,11 +185,11 @@
         <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl mt-4 text-left">
           <p class="font-bold text-amber-300 text-xs mb-1 flex items-center gap-1">❤️ Soutenez le projet :</p>
           <p class="text-[11px] text-indigo-200/80 leading-relaxed mb-2.5">
-            L'outil est 100% gratuit ! Si l'application vous plaît, vous pouvez soutenir la cause en envoyant une contribution (au moins <strong>100 FCFA</strong>) par Mobile Money :
+            L'outil est 100% gratuit ! Si l'application vous plaît, soutenez la cause avec une contribution (au moins <strong>100 FCFA</strong>) par Mobile Money :
           </p>
           <div class="bg-slate-900/90 p-3 rounded-xl border border-amber-500/20 text-[11px] font-semibold space-y-1">
             <p class="text-yellow-400">📱 <strong>MTN Money :</strong> <span>069130594</span></p>
-            <p class="text-red-400">📱 <strong>Airtel Money :</strong> <span>069130594</span></p>
+            <p class="text-red-400">📱 <strong>Airtel Money :</strong> <span>053191164</span></p>
           </div>
         </div>
 
@@ -193,6 +216,9 @@
 
   </div>
 
+  <!-- CHAT ANIMÉ QUI SE PROMÈNE -->
+  <div class="animated-cat">🐈‍⬛</div>
+
   <script>
     const params = new URLSearchParams(window.location.search);
     const invitee = params.get('to');
@@ -208,7 +234,6 @@
 
     const inviteId = "disoui_read_" + btoa(encodeURIComponent((invitee || '') + (sender || '') + (dateParam || ''))).replace(/=/g, '');
 
-    // CONFIGURATION DES 3 MODES
     const relationConfigs = {
       friend: {
         bodyClass: 'theme-friend',
