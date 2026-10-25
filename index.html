@@ -199,101 +199,112 @@
     const instaParam = params.get('ig');
     const snapParam = params.get('sc');
 
+    // Identifiant unique de l'invitation pour la lecture unique
+    const inviteId = "invite_cine_read_" + btoa(encodeURIComponent((invitee || '') + (sender || '') + (dateParam || ''))).replace(/=/g, '');
+
     if (invitee && sender) {
-      document.getElementById('createMode').classList.add('hidden');
-      document.getElementById('viewMode').classList.remove('hidden');
+      // VÉRIFICATION LECTURE UNIQUE : Si déjà répondu/ouvert, redirection vers le créateur
+      if (localStorage.getItem(inviteId) === "opened") {
+        window.location.href = window.location.pathname;
+      } else {
+        document.getElementById('createMode').classList.add('hidden');
+        document.getElementById('viewMode').classList.remove('hidden');
 
-      document.getElementById('inviteeNameDisplay').innerText = invitee;
-      document.getElementById('senderDisplay').querySelector('span').innerText = sender;
-      document.getElementById('emojiDisplay').innerText = emoji || '✨';
-      document.getElementById('headlineDisplay').innerText = title || 'Ça te dit une sortie ?';
-      document.getElementById('activityDisplay').innerText = activity || 'Sortie';
-      
-      if(locationParam) {
-        document.getElementById('locationDisplay').innerText = locationParam;
-        document.getElementById('mapsLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationParam)}`;
-      }
-
-      let formattedDateTime = "À convenir";
-      if(dateParam) {
-        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        const dateObj = new Date(dateParam + 'T00:00:00');
-        const dateFormatted = dateObj.toLocaleDateString('fr-FR', options);
-        formattedDateTime = timeParam ? `${dateFormatted} à ${timeParam}` : dateFormatted;
-      }
-      document.getElementById('datetimeDisplay').innerText = formattedDateTime;
-      
-      if(noteParam) {
-        document.getElementById('noteContainer').classList.remove('hidden');
-        document.getElementById('noteDisplay').innerText = noteParam;
-      }
-
-      const noBtn = document.getElementById('noBtn');
-      let isUp = true;
-      const phrases = ["Tu es sûre ?", "Sérieusement ?", "Un petit effort 🥺", "Je paye mon coup !", "Mauvaise touche !", "Essaie encore 😜"];
-      let phraseIdx = 0;
-
-      function moveNoButton(e) {
-        if(e) e.preventDefault();
-        noBtn.innerText = phrases[phraseIdx % phrases.length];
-        phraseIdx++;
-        noBtn.style.transform = isUp ? 'translateY(-45px)' : 'translateY(45px)';
-        isUp = !isUp;
-      }
-
-      noBtn.addEventListener('click', moveNoButton);
-      noBtn.addEventListener('touchstart', moveNoButton);
-
-      document.getElementById('yesBtn').addEventListener('click', () => {
-        document.getElementById('viewMode').classList.add('hidden');
-        document.getElementById('successMode').classList.remove('hidden');
+        document.getElementById('inviteeNameDisplay').innerText = invitee;
+        document.getElementById('senderDisplay').querySelector('span').innerText = sender;
+        document.getElementById('emojiDisplay').innerText = emoji || '✨';
+        document.getElementById('headlineDisplay').innerText = title || 'Ça te dit une sortie ?';
+        document.getElementById('activityDisplay').innerText = activity || 'Sortie';
         
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-
-        const confirmMsg = `Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`;
-        const encodedMsg = encodeURIComponent(confirmMsg);
-
-        document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodedMsg}`;
-        document.getElementById('smsBtn').href = `sms:?body=${encodedMsg}`;
-
-        const copyAlert = document.getElementById('copyAlert');
-        
-        function handleSocialCopy(profileUrl) {
-          navigator.clipboard.writeText(confirmMsg).then(() => {
-            copyAlert.classList.remove('hidden');
-            setTimeout(() => {
-              window.open(profileUrl, '_blank');
-            }, 1000);
-          });
+        if(locationParam) {
+          document.getElementById('locationDisplay').innerText = locationParam;
+          document.getElementById('mapsLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationParam)}`;
         }
 
-        document.getElementById('instaBtn').addEventListener('click', () => {
-          const instaUrl = instaParam ? `https://instagram.com/${instaParam.replace('@','')}` : 'https://instagram.com';
-          handleSocialCopy(instaUrl);
-        });
-
-        document.getElementById('snapBtn').addEventListener('click', () => {
-          const snapUrl = snapParam ? `https://snapchat.com/add/${snapParam.replace('@','')}` : 'https://snapchat.com';
-          handleSocialCopy(snapUrl);
-        });
-
+        let formattedDateTime = "À convenir";
         if(dateParam) {
-          const cleanDate = dateParam.replace(/-/g, '');
-          const cleanTime = timeParam ? timeParam.replace(':', '') + '00' : '190000';
-          const startIso = `${cleanDate}T${cleanTime}`;
-          
-          const endDateObj = new Date(`${dateParam}T${timeParam || '19:00'}:00`);
-          endDateObj.setHours(endDateObj.getHours() + 2);
-          const endCleanDate = endDateObj.toISOString().slice(0,10).replace(/-/g, '');
-          const endCleanTime = endDateObj.toTimeString().slice(0,8).replace(/:/g, '');
-          const endIso = `${endCleanDate}T${endCleanTime}`;
-
-          const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activity + ' avec ' + sender)}&dates=${startIso}/${endIso}&details=${encodeURIComponent(noteParam || '')}&location=${encodeURIComponent(locationParam || '')}`;
-          document.getElementById('gcalBtn').href = gcalUrl;
-        } else {
-          document.getElementById('gcalBtn').style.display = 'none';
+          const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+          const dateObj = new Date(dateParam + 'T00:00:00');
+          const dateFormatted = dateObj.toLocaleDateString('fr-FR', options);
+          formattedDateTime = timeParam ? `${dateFormatted} à ${timeParam}` : dateFormatted;
         }
-      });
+        document.getElementById('datetimeDisplay').innerText = formattedDateTime;
+        
+        if(noteParam) {
+          document.getElementById('noteContainer').classList.remove('hidden');
+          document.getElementById('noteDisplay').innerText = noteParam;
+        }
+
+        const noBtn = document.getElementById('noBtn');
+        let isUp = true;
+        const phrases = ["Tu es sûre ?", "Sérieusement ?", "Un petit effort 🥺", "Je paye mon coup !", "Mauvaise touche !", "Essaie encore 😜"];
+        let phraseIdx = 0;
+
+        function moveNoButton(e) {
+          if(e) e.preventDefault();
+          noBtn.innerText = phrases[phraseIdx % phrases.length];
+          phraseIdx++;
+          noBtn.style.transform = isUp ? 'translateY(-45px)' : 'translateY(45px)';
+          isUp = !isUp;
+        }
+
+        noBtn.addEventListener('click', moveNoButton);
+        noBtn.addEventListener('touchstart', moveNoButton);
+
+        document.getElementById('yesBtn').addEventListener('click', () => {
+          // MARQUER LE LIEN COMME LU DANS LE NAVIGATEUR DE L'INVITÉ
+          localStorage.setItem(inviteId, "opened");
+
+          document.getElementById('viewMode').classList.add('hidden');
+          document.getElementById('successMode').classList.remove('hidden');
+          
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+          const confirmMsg = `Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`;
+          const encodedMsg = encodeURIComponent(confirmMsg);
+
+          document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodedMsg}`;
+          document.getElementById('smsBtn').href = `sms:?body=${encodedMsg}`;
+
+          const copyAlert = document.getElementById('copyAlert');
+          
+          function handleSocialCopy(profileUrl) {
+            navigator.clipboard.writeText(confirmMsg).then(() => {
+              copyAlert.classList.remove('hidden');
+              setTimeout(() => {
+                window.open(profileUrl, '_blank');
+              }, 1000);
+            });
+          }
+
+          document.getElementById('instaBtn').addEventListener('click', () => {
+            const instaUrl = instaParam ? `https://instagram.com/${instaParam.replace('@','')}` : 'https://instagram.com';
+            handleSocialCopy(instaUrl);
+          });
+
+          document.getElementById('snapBtn').addEventListener('click', () => {
+            const snapUrl = snapParam ? `https://snapchat.com/add/${snapParam.replace('@','')}` : 'https://snapchat.com';
+            handleSocialCopy(snapUrl);
+          });
+
+          if(dateParam) {
+            const cleanDate = dateParam.replace(/-/g, '');
+            const cleanTime = timeParam ? timeParam.replace(':', '') + '00' : '190000';
+            const startIso = `${cleanDate}T${cleanTime}`;
+            
+            const endDateObj = new Date(`${dateParam}T${timeParam || '19:00'}:00`);
+            endDateObj.setHours(endDateObj.getHours() + 2);
+            const endCleanDate = endDateObj.toISOString().slice(0,10).replace(/-/g, '');
+            const endCleanTime = endDateObj.toTimeString().slice(0,8).replace(/:/g, '');
+            const endIso = `${endCleanDate}T${endCleanTime}`;
+
+            const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activity + ' avec ' + sender)}&dates=${startIso}/${endIso}&details=${encodeURIComponent(noteParam || '')}&location=${encodeURIComponent(locationParam || '')}`;
+            document.getElementById('gcalBtn').href = gcalUrl;
+          } else {
+            document.getElementById('gcalBtn').style.display = 'none';
+          }
+        });
+      }
 
     } else {
       const categorySelect = document.getElementById('inputCategory');
