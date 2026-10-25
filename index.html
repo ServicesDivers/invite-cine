@@ -53,6 +53,15 @@
       90% { opacity: 0.7; }
       100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
+
+    /* ANIMATION DE SORTIE DE L'ENVELOPPE */
+    @keyframes slideUpCard {
+      0% { transform: translateY(60px) scale(0.9); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .card-appear {
+      animation: slideUpCard 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
 <body class="theme-default min-h-screen flex items-center justify-center p-3 sm:p-6 relative">
@@ -60,8 +69,21 @@
   <!-- PARTICULES DE FOND -->
   <div id="particlesContainer" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
 
-  <!-- CARTE PRINCIPALE TRANSLUXIDE (FOND FONDU) -->
-  <div class="w-full max-w-md bg-slate-950/40 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/15 text-center relative z-10 overflow-hidden transition-all duration-500">
+  <!-- ÉCRAN DE L'ENVELOPPE (VUE INVITÉ FERMÉE) -->
+  <div id="envelopeScreen" class="hidden w-full max-w-sm text-center relative z-10 p-6">
+    <div class="bg-black/40 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/20 text-center relative overflow-hidden">
+      <div class="text-6xl mb-4 animate-bounce">💌</div>
+      <h2 class="text-xl font-extrabold text-white mb-2">Un message secret t'attend !</h2>
+      <p class="text-xs text-white/70 mb-6">Envoyé spécialement par <span id="envSender" class="font-bold text-white">...</span></p>
+      
+      <button id="openEnvelopeBtn" class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 text-white font-bold py-4 px-6 rounded-2xl shadow-xl transition active:scale-95 text-sm flex items-center justify-center gap-2">
+        <span>Ouvrir l'enveloppe ✉️✨</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CARTE PRINCIPALE (CONTENU DÉPLOYÉ OU CRÉATEUR) -->
+  <div id="mainCard" class="w-full max-w-md bg-slate-950/40 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/15 text-center relative z-10 overflow-hidden transition-all duration-500">
     
     <!-- LOGO -->
     <div class="flex items-center justify-center gap-2 mb-4 pb-3 border-b border-white/10">
@@ -70,9 +92,9 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- VUE INVITÉ (RÉCEPTION) -->
+    <!-- VUE INVITÉ (RÉCEPTION - APRÈS OUVERTURE) -->
     <!-- ========================================== -->
-    <div id="viewMode" class="hidden">
+    <div id="viewMode" class="hidden card-appear">
       <div id="relationBadge" class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 border tracking-wider uppercase">
         Pour toi, <span id="inviteeNameDisplay">...</span>
       </div>
@@ -348,11 +370,23 @@
       if (localStorage.getItem(inviteId) === "opened") {
         window.location.href = window.location.pathname;
       } else {
+        // AFFICHAGE DE L'ENVELOPPE FERMÉE EN PREMIER
         document.getElementById('createMode').classList.add('hidden');
-        document.getElementById('viewMode').classList.remove('hidden');
+        document.getElementById('mainCard').classList.add('hidden');
+        document.getElementById('envelopeScreen').classList.remove('hidden');
+        document.getElementById('envSender').innerText = sender;
 
         const config = relationConfigs[relation] || relationConfigs.default;
         document.body.className = `${config.bodyClass} min-h-screen flex items-center justify-center p-3 sm:p-6 relative`;
+
+        // QUAND ON CLIQUE SUR L'ENVELOPPE POUR L'OUVRIR
+        document.getElementById('openEnvelopeBtn').addEventListener('click', () => {
+          document.getElementById('envelopeScreen').classList.add('hidden');
+          document.getElementById('mainCard').classList.remove('hidden');
+          document.getElementById('viewMode').classList.remove('hidden');
+          
+          confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+        });
         
         const badgeElem = document.getElementById('relationBadge');
         badgeElem.className = `inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 border tracking-wider uppercase ${config.badgeStyle}`;
