@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>InviteLover — Dis Oui</title>
+  <title>InviteCiné — Cartes Magiques & Invitations</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s ease; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
     .btn-moving { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    input, select { font-size: 16px !important; }
+    input, select, textarea { font-size: 16px !important; }
     
     /* THÈMES DYNAMIQUES */
     body.theme-friend { background: linear-gradient(135deg, #fef3c7, #fde68a, #fef08a); color: #78350f; }
@@ -36,7 +36,7 @@
       pointer-events: none;
     }
 
-    /* PARTICULES FLOTTANTES EN ARRIÈRE-PLAN */
+    /* PARTICULES FLOTTANTES */
     .bg-particle {
       position: fixed;
       top: -10vh;
@@ -57,57 +57,76 @@
 </head>
 <body class="theme-default min-h-screen flex items-center justify-center p-3 sm:p-6 relative">
 
-  <!-- CONTENEUR DES PARTICULES DE FOND -->
+  <!-- PARTICULES DE FOND -->
   <div id="particlesContainer" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
 
-  <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative z-10 overflow-hidden transition-all duration-500">
+  <!-- CARTE PRINCIPALE TRANSLUXIDE (FOND FONDU) -->
+  <div class="w-full max-w-md bg-slate-950/40 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/15 text-center relative z-10 overflow-hidden transition-all duration-500">
     
-    <!-- LOGO DE LA PLATEFORME -->
+    <!-- LOGO -->
     <div class="flex items-center justify-center gap-2 mb-4 pb-3 border-b border-white/10">
       <span class="text-xl">💌</span>
-      <span class="font-extrabold text-xs tracking-widest uppercase opacity-90 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-300">InviteLover</span>
+      <span class="font-extrabold text-xs tracking-widest uppercase opacity-90 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-300">InviteCiné</span>
     </div>
 
-    <!-- VUE INVITÉ -->
+    <!-- ========================================== -->
+    <!-- VUE INVITÉ (RÉCEPTION) -->
+    <!-- ========================================== -->
     <div id="viewMode" class="hidden">
       <div id="relationBadge" class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 border tracking-wider uppercase">
         Pour toi, <span id="inviteeNameDisplay">...</span>
       </div>
       
       <div id="emojiDisplay" class="text-5xl mb-2 animate-bounce">✨</div>
-      <h1 id="headlineDisplay" class="text-2xl font-extrabold text-white mb-1">On se fait une sortie ?</h1>
-      <p id="subHeadlineDisplay" class="text-xs text-white/70 italic mb-6">(dire non ne sert à rien, mais tu peux essayer)</p>
+      <h1 id="headlineDisplay" class="text-2xl font-extrabold text-white mb-1">Message spécial !</h1>
+      <p id="subHeadlineDisplay" class="text-xs text-white/70 italic mb-6">Un message rien que pour toi</p>
 
-      <div class="bg-black/30 backdrop-blur-md p-4 rounded-2xl border border-white/10 mb-6 text-left text-sm space-y-3 shadow-inner">
-        <p class="flex items-center gap-2">✨ <strong class="text-white/80">Activité :</strong> <span id="activityDisplay" class="font-bold text-white">Sortie</span></p>
+      <!-- BLOC CONTENU -->
+      <div class="bg-black/25 backdrop-blur-md p-4 rounded-2xl border border-white/10 mb-6 text-left text-sm space-y-3 shadow-inner">
+        <div id="activityBox">
+          <p class="flex items-center gap-2">✨ <strong class="text-white/85">Objet :</strong> <span id="activityDisplay" class="font-bold text-white">Sortie</span></p>
+        </div>
         
-        <div>
+        <div id="locationBox">
           <a id="mapsLink" href="#" target="_blank" class="flex items-center justify-between bg-white/10 p-3 rounded-xl border border-white/10 hover:bg-white/20 transition text-xs text-white">
-            <span class="truncate pr-2">📍 <strong class="text-white/80">Lieu :</strong> <span id="locationDisplay">À définir</span></span>
+            <span class="truncate pr-2">📍 <strong class="text-white/85">Lieu :</strong> <span id="locationDisplay">À définir</span></span>
             <span class="text-amber-300 underline shrink-0 font-semibold">Maps ↗</span>
           </a>
         </div>
 
-        <p class="flex items-center gap-2">📅 <strong class="text-white/80">Quand :</strong> <span id="datetimeDisplay" class="font-bold text-white">À convenir</span></p>
-        <p id="noteContainer" class="hidden italic text-xs text-white/70 pt-2 border-t border-white/10">💬 <span id="noteDisplay"></span></p>
-        <p id="senderDisplay" class="text-xs text-right text-white/70 pt-2 border-t border-white/10">Proposé par <span class="font-bold text-white">...</span></p>
+        <div id="datetimeBox">
+          <p class="flex items-center gap-2">📅 <strong class="text-white/85">Quand :</strong> <span id="datetimeDisplay" class="font-bold text-white">À convenir</span></p>
+        </div>
+
+        <p class="pt-2 border-t border-white/10 text-xs text-white/90 leading-relaxed">
+          💬 <span id="noteDisplay" class="font-medium italic">...</span>
+        </p>
+
+        <p id="senderDisplay" class="text-xs text-right text-white/70 pt-2 border-t border-white/10">De la part de <span class="font-bold text-white">...</span></p>
       </div>
 
-      <div class="flex items-center justify-center gap-3 relative min-h-[80px] my-2">
-        <button id="yesBtn" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transition text-base z-10 active:scale-95">
-          Oui ! ✨
+      <!-- BOUTONS D'INTERACTION -->
+      <div id="inviteActions" class="flex items-center justify-center gap-3 relative min-h-[80px] my-2">
+        <button id="yesBtn" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transition text-base z-10 active:scale-95">
+          Accepter ! ✨
         </button>
         <button id="noBtn" class="btn-moving flex-1 bg-white/10 border border-white/20 text-white font-semibold py-3.5 px-6 rounded-2xl shadow-sm text-base z-20">
           Non
         </button>
       </div>
+
+      <div id="messageActions" class="hidden space-y-3">
+        <button id="reactBtn" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition text-xs active:scale-95">
+          💖 Répondre avec le cœur
+        </button>
+      </div>
     </div>
 
-    <!-- ÉCRAN DE CONFIRMATION -->
+    <!-- ÉCRAN DE CONFIRMATION / SUCCÈS -->
     <div id="successMode" class="hidden">
-      <div class="text-5xl mb-3">🎉🥳</div>
-      <h2 class="text-2xl font-extrabold text-white mb-1">Rendez-vous confirmé !</h2>
-      <p class="text-xs text-white/80 mb-4">Choisis comment tu veux me répondre :</p>
+      <div class="text-5xl mb-3" id="successEmoji">🎉🥳</div>
+      <h2 class="text-2xl font-extrabold text-white mb-1" id="successTitle">C'est validé !</h2>
+      <p class="text-xs text-white/80 mb-4">Choisis comment répondre :</p>
       
       <a id="gcalBtn" href="#" target="_blank" class="w-full block bg-white/10 border border-white/20 text-white hover:bg-white/20 font-semibold py-3 px-4 rounded-xl text-xs mb-4 shadow-sm transition">
         📅 Ajouter à Google Calendar
@@ -120,107 +139,114 @@
         <a id="smsBtn" href="#" class="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
           <span>💬 SMS</span>
         </a>
-        <button id="instaBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
-          <span>📸 Instagram</span>
-        </button>
-        <button id="snapBtn" class="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
-          <span>👻 Snapchat</span>
-        </button>
       </div>
 
       <div class="mt-6 pt-5 border-t border-white/10">
         <a href="./" class="w-full block bg-gradient-to-r from-pink-500 to-indigo-600 hover:opacity-90 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition text-xs flex items-center justify-center gap-2 active:scale-95">
-          <span>✨ Toi aussi, crée ton invitation gratuite !</span>
+          <span>✨ Toi aussi, crée ta carte gratuite !</span>
         </a>
       </div>
     </div>
 
+    <!-- ========================================== -->
     <!-- VUE CRÉATEUR -->
+    <!-- ========================================== -->
     <div id="createMode">
-      <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 mb-1">Dis Oui 💌</h1>
-      <p class="text-xs text-indigo-200/70 mb-5">Crée ton invitation interactive adaptée à votre relation.</p>
+      <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 mb-1">InviteCiné 💌</h1>
+      <p class="text-xs text-white/70 mb-5">Choisis ce que tu veux envoyer et personnalise ton message.</p>
 
       <form id="inviteForm" class="text-left space-y-3.5 text-xs">
         
         <div>
-          <label class="block font-semibold mb-1 text-pink-300">👥 Quel est votre lien ?</label>
-          <select id="inputRelation" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800 text-white font-semibold focus:outline-none focus:border-pink-500">
-            <option value="friend">💛 Amie (Amical, fun & décontracté)</option>
-            <option value="flirt">🔥 Flirt (Coquin, taquin & piquant)</option>
-            <option value="love">🍫 Couple / Amour (Cœurs chocolat & romance)</option>
+          <label class="block font-semibold mb-1 text-pink-300">🎯 Que veux-tu envoyer ?</label>
+          <select id="inputType" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white font-semibold focus:outline-none focus:border-pink-500">
+            <option value="invite" class="bg-slate-900">🍿 Proposer une sortie / Invitation</option>
+            <option value="pardon" class="bg-slate-900">🥺 Se faire pardonner (Demande de pardon)</option>
+            <option value="love" class="bg-slate-900">💌 Envoyer un mot d'amour</option>
           </select>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1 text-indigo-200">Son prénom / surnom :</label>
-          <input type="text" id="inputInvitee" required placeholder="ex: Sarah" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
-        </div>
-
-        <div>
-          <label class="block font-semibold mb-1 text-indigo-200">Ton prénom :</label>
-          <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
-        </div>
-
-        <div>
-          <label class="block font-semibold mb-1 text-indigo-200">Type d'activité :</label>
-          <select id="inputCategory" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800 text-white font-medium focus:outline-none focus:border-indigo-400">
-            <option value="🍿|Cinéma|Ça te dit un ciné ?">🍿 Cinéma</option>
-            <option value="🍷|Restaurant / Dîner|On se fait un resto ?">🍷 Restaurant / Dîner</option>
-            <option value="🍹|Prendre un verre|On va boire un verre ?">🍹 Boire un verre</option>
-            <option value="☕|Café & Balade|Un café & une balade ?">☕ Café & Balade</option>
-            <option value="🥳|Soirée / Fête|Viens à ma soirée !">🥳 Soirée / Fête</option>
-            <option value="🎳|Bowling / Jeu|Partie de Bowling ?">🎳 Bowling / Jeu</option>
+          <label class="block font-semibold mb-1 text-pink-300">👥 Type de relation (Ambiance) :</label>
+          <select id="inputRelation" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white font-semibold focus:outline-none focus:border-pink-500">
+            <option value="friend" class="bg-slate-900">💛 Amie (Amical, fun & décontracté)</option>
+            <option value="flirt" class="bg-slate-900">🔥 Flirt (Coquin, taquin & piquant)</option>
+            <option value="love" class="bg-slate-900">🍫 Couple / Romance (Cœurs chocolat & passion)</option>
           </select>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1 text-indigo-200">Lieu :</label>
-          <input type="text" id="inputLocation" placeholder="ex: Pathé Bellecour, Lyon" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+          <label class="block font-semibold mb-1 text-white/90">Son prénom / surnom :</label>
+          <input type="text" id="inputInvitee" required placeholder="ex: Sarah" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white placeholder-white/40 focus:outline-none focus:border-pink-400">
         </div>
 
-        <div class="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-3">
+        <div>
+          <label class="block font-semibold mb-1 text-white/90">Ton prénom :</label>
+          <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white placeholder-white/40 focus:outline-none focus:border-pink-400">
+        </div>
+
+        <!-- CHAMPS SPÉCIFIQUES INVITATION -->
+        <div id="inviteFields" class="space-y-3.5">
           <div>
-            <label class="block font-semibold mb-1 text-indigo-200">Date :</label>
-            <input type="date" id="inputDate" required class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+            <label class="block font-semibold mb-1 text-white/90">Type d'activité :</label>
+            <select id="inputCategory" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white font-medium focus:outline-none focus:border-pink-400">
+              <option value="🍿|Cinéma|Ça te dit un ciné ?" class="bg-slate-900">🍿 Cinéma</option>
+              <option value="🍷|Restaurant / Dîner|On se fait un resto ?" class="bg-slate-900">🍷 Restaurant / Dîner</option>
+              <option value="🍹|Prendre un verre|On va boire un verre ?" class="bg-slate-900">🍹 Boire un verre</option>
+              <option value="☕|Café & Balade|Un café & une balade ?" class="bg-slate-900">☕ Café & Balade</option>
+              <option value="🥳|Soirée / Fête|Viens à ma soirée !" class="bg-slate-900">🥳 Soirée / Fête</option>
+            </select>
           </div>
+
           <div>
-            <label class="block font-semibold mb-1 text-indigo-200">Heure :</label>
-            <input type="time" id="inputTime" required class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+            <label class="block font-semibold mb-1 text-white/90">Lieu :</label>
+            <input type="text" id="inputLocation" placeholder="ex: Pathé Bellecour" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white placeholder-white/40 focus:outline-none focus:border-pink-400">
+          </div>
+
+          <div class="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-3">
+            <div>
+              <label class="block font-semibold mb-1 text-white/90">Date :</label>
+              <input type="date" id="inputDate" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white focus:outline-none focus:border-pink-400">
+            </div>
+            <div>
+              <label class="block font-semibold mb-1 text-white/90">Heure :</label>
+              <input type="time" id="inputTime" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white focus:outline-none focus:border-pink-400">
+            </div>
           </div>
         </div>
 
         <div>
-          <label class="block font-semibold mb-1 text-indigo-200">Petit mot (optionnel) :</label>
-          <input type="text" id="inputNote" placeholder="ex: Je m'occupe de tout !" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+          <label class="block font-semibold mb-1 text-white/90" id="noteLabel">Petit mot (optionnel) :</label>
+          <textarea id="inputNote" rows="3" placeholder="ex: Je m'occupe de tout !" class="w-full p-3.5 border border-white/20 rounded-xl bg-black/40 text-white placeholder-white/40 focus:outline-none focus:border-pink-400 resize-none"></textarea>
         </div>
 
         <!-- ENCADRÉ SOUTIEN SOLIDAIRE MOBILE MONEY -->
-        <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl mt-4 text-left">
+        <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl mt-4 text-left backdrop-blur-md">
           <p class="font-bold text-amber-300 text-xs mb-1 flex items-center gap-1">❤️ Soutenez le projet :</p>
-          <p class="text-[11px] text-indigo-200/80 leading-relaxed mb-2.5">
+          <p class="text-[11px] text-white/80 leading-relaxed mb-2.5">
             L'outil est 100% gratuit ! Soutenez la cause avec une contribution (au moins <strong>100 FCFA</strong>) par Mobile Money :
           </p>
-          <div class="bg-slate-900/90 p-3 rounded-xl border border-amber-500/20 text-[11px] font-semibold space-y-1">
-            <p class="text-yellow-400">📱 <strong>MTN Money :</strong> <span>069130594</span></p>
-            <p class="text-red-400">📱 <strong>Airtel Money :</strong> <span>069130594</span></p>
+          <div class="bg-black/40 p-3 rounded-xl border border-amber-500/20 text-[11px] font-semibold space-y-1">
+            <p class="text-yellow-300">📱 <strong>MTN Money :</strong> <span>069130594</span></p>
+            <p class="text-rose-300">📱 <strong>Airtel Money :</strong> <span>069130594</span></p>
           </div>
         </div>
 
         <button type="submit" class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 text-white font-bold py-4 rounded-xl shadow-lg transition text-sm mt-4 active:scale-95">
-          Générer l'Invitation 🚀
+          Générer ma Carte Magique 🚀
         </button>
       </form>
 
       <!-- RÉSULTAT -->
-      <div id="createdResult" class="hidden mt-6 pt-5 border-t border-indigo-500/20">
-        <p class="text-xs text-emerald-400 font-bold mb-2">✅ Invitation prête !</p>
+      <div id="createdResult" class="hidden mt-6 pt-5 border-t border-white/15">
+        <p class="text-xs text-emerald-400 font-bold mb-2">✅ Lien prêt à être partagé !</p>
         <div class="flex items-center gap-2 mb-4">
-          <input type="text" id="generatedUrl" readonly class="w-full p-3 text-xs border border-indigo-500/30 rounded-xl bg-slate-800 text-indigo-200 focus:outline-none">
+          <input type="text" id="generatedUrl" readonly class="w-full p-3 text-xs border border-white/20 rounded-xl bg-black/40 text-white focus:outline-none">
           <button id="copyBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-xs font-bold shrink-0 active:scale-95">Copier</button>
         </div>
         <div class="text-center">
           <img id="generatedQr" src="" alt="QR Code" class="mx-auto w-32 h-32 p-2 bg-white rounded-2xl mb-3 shadow-lg">
-          <button id="downloadQrBtn" class="w-full bg-slate-800 hover:bg-slate-700 border border-indigo-500/30 text-indigo-200 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
+          <button id="downloadQrBtn" class="w-full bg-black/40 hover:bg-black/60 border border-white/20 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
             <span>📥 Télécharger l'image du QR Code</span>
           </button>
         </div>
@@ -233,11 +259,30 @@
   <div class="animated-cat">🐈‍⬛</div>
 
   <script>
-    // GÉNÉRATEUR DE PARTICULES FLOTTANTES SELON LE MODE
+    const typeSelect = document.getElementById('inputType');
+    const inviteFields = document.getElementById('inviteFields');
+    const noteLabel = document.getElementById('noteLabel');
+    const noteInput = document.getElementById('inputNote');
+
+    typeSelect.addEventListener('change', () => {
+      if (typeSelect.value === 'invite') {
+        inviteFields.style.display = 'block';
+        noteLabel.innerText = "Petit mot (optionnel) :";
+        noteInput.placeholder = "ex: Je m'occupe de tout !";
+      } else if (typeSelect.value === 'pardon') {
+        inviteFields.style.display = 'none';
+        noteLabel.innerText = "Votre message de pardon :";
+        noteInput.placeholder = "ex: Je suis vraiment désolé(e), pardonne-moi stp 🥺";
+      } else if (typeSelect.value === 'love') {
+        inviteFields.style.display = 'none';
+        noteLabel.innerText = "Votre mot d'amour :";
+        noteInput.placeholder = "ex: Tu es la chose la plus précieuse dans ma vie ❤️";
+      }
+    });
+
     function initParticles(rel) {
       const container = document.getElementById('particlesContainer');
       container.innerHTML = '';
-      
       let emojis = ['✨', '⭐', '💫'];
       if (rel === 'friend') emojis = ['😂', '🎉', '🍕', '⭐', '🔥'];
       if (rel === 'flirt') emojis = ['🔥', '😏', '💋', '😈', '👀', '✨'];
@@ -256,6 +301,7 @@
     }
 
     const params = new URLSearchParams(window.location.search);
+    const type = params.get('type') || 'invite';
     const invitee = params.get('to');
     const sender = params.get('from');
     const activity = params.get('act');
@@ -269,31 +315,31 @@
 
     initParticles(relation);
 
-    const inviteId = "disoui_read_" + btoa(encodeURIComponent((invitee || '') + (sender || '') + (dateParam || ''))).replace(/=/g, '');
+    const inviteId = "invitecine_read_" + btoa(encodeURIComponent((invitee || '') + (sender || '') + (noteParam || ''))).replace(/=/g, '');
 
     const relationConfigs = {
       friend: {
         bodyClass: 'theme-friend',
-        badge: '💛 Mode Amie',
-        badgeStyle: 'bg-amber-400/20 text-amber-800 border-amber-400/30',
+        badge: '💛 Amie',
+        badgeStyle: 'bg-amber-400/20 text-amber-900 border-amber-400/40',
         phrases: ["Une autre fois ?", "Tu rates un truc !", "Réfléchis bien 😉", "Tu es sûre ?", "Même pas en rêve ? 😜"]
       },
       flirt: {
         bodyClass: 'theme-flirt',
-        badge: '🔥 Mode Flirt Coquin',
-        badgeStyle: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+        badge: '🔥 Flirt Coquin',
+        badgeStyle: 'bg-pink-500/20 text-pink-200 border-pink-500/40',
         phrases: ["Trop timide ? 😏", "Mauvaise touche...", "Tu ne m'échapperas pas 🔥", "Ose dire non 😈", "Sérieusement ? 😘"]
       },
       love: {
         bodyClass: 'theme-love',
-        badge: '🍫 Mode Couple & Romance',
-        badgeStyle: 'bg-rose-500/20 text-rose-200 border-rose-500/30',
+        badge: '🍫 Romantique',
+        badgeStyle: 'bg-rose-500/20 text-rose-100 border-rose-500/40',
         phrases: ["Mon cœur va briser 🥺", "Interdit de refuser ❤️", "Dis oui à ton amour 🥰", "Regarde-moi dans les yeux ✨", "C'est un piège doux 🍫"]
       },
       default: {
         bodyClass: 'theme-default',
-        badge: '✨ Invitation',
-        badgeStyle: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+        badge: '✨ Message',
+        badgeStyle: 'bg-indigo-500/20 text-indigo-200 border-indigo-500/40',
         phrases: ["Tu es sûre ?", "Un petit effort 🥺", "Mauvaise touche !", "Essaie encore 😜"]
       }
     };
@@ -313,24 +359,33 @@
         badgeElem.innerHTML = `${config.badge} pour <span id="inviteeNameDisplay">${invitee}</span>`;
 
         document.getElementById('senderDisplay').querySelector('span').innerText = sender;
-        document.getElementById('emojiDisplay').innerText = emoji || '✨';
-        document.getElementById('headlineDisplay').innerText = title || 'Ça te dit une sortie ?';
-        document.getElementById('activityDisplay').innerText = activity || 'Sortie';
+        document.getElementById('emojiDisplay').innerText = emoji || (type === 'pardon' ? '🥺' : type === 'love' ? '❤️' : '✨');
+        document.getElementById('headlineDisplay').innerText = title || (type === 'pardon' ? 'Demande de Pardon' : type === 'love' ? 'Mot d’Amour' : 'Invitation');
 
-        if(locationParam) {
-          document.getElementById('locationDisplay').innerText = locationParam;
-          document.getElementById('mapsLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationParam)}`;
-        }
-
-        if(dateParam) {
-          const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-          const dateObj = new Date(dateParam + 'T00:00:00');
-          document.getElementById('datetimeDisplay').innerText = timeParam ? `${dateObj.toLocaleDateString('fr-FR', options)} à ${timeParam}` : dateObj.toLocaleDateString('fr-FR', options);
-        }
-
-        if(noteParam) {
-          document.getElementById('noteContainer').classList.remove('hidden');
-          document.getElementById('noteDisplay').innerText = noteParam;
+        if (type === 'invite') {
+          document.getElementById('activityDisplay').innerText = activity || 'Sortie';
+          if(locationParam) {
+            document.getElementById('locationDisplay').innerText = locationParam;
+            document.getElementById('mapsLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationParam)}`;
+          } else {
+            document.getElementById('locationBox').style.display = 'none';
+          }
+          if(dateParam) {
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const dateObj = new Date(dateParam + 'T00:00:00');
+            document.getElementById('datetimeDisplay').innerText = timeParam ? `${dateObj.toLocaleDateString('fr-FR', options)} à ${timeParam}` : dateObj.toLocaleDateString('fr-FR', options);
+          } else {
+            document.getElementById('datetimeBox').style.display = 'none';
+          }
+          document.getElementById('noteDisplay').innerText = noteParam || "Hâte d'y être !";
+        } else {
+          document.getElementById('activityBox').style.display = 'none';
+          document.getElementById('locationBox').style.display = 'none';
+          document.getElementById('datetimeBox').style.display = 'none';
+          document.getElementById('noteDisplay').innerText = noteParam || "Message spécial pour toi.";
+          
+          document.getElementById('inviteActions').classList.add('hidden');
+          document.getElementById('messageActions').classList.remove('hidden');
         }
 
         const noBtn = document.getElementById('noBtn');
@@ -354,25 +409,40 @@
           document.getElementById('successMode').classList.remove('hidden');
           confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
 
-          const confirmMsg = `Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`;
+          const confirmMsg = type === 'invite' 
+            ? `Coucou ${sender} ! C'est OUI pour "${activity}" ! 🎉`
+            : `Coucou ${sender} ! J'ai bien reçu ton message. ❤️`;
           const encodedMsg = encodeURIComponent(confirmMsg);
 
           document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodedMsg}`;
           document.getElementById('smsBtn').href = `sms:?body=${encodedMsg}`;
-          
-          document.getElementById('instaBtn').addEventListener('click', () => {
-            navigator.clipboard.writeText(confirmMsg).then(() => {
-              alert('📋 Message copié ! Ouvre Instagram pour lui envoyer.');
-              window.location.href = 'instagram://';
-            });
-          });
 
-          document.getElementById('snapBtn').addEventListener('click', () => {
-            navigator.clipboard.writeText(confirmMsg).then(() => {
-              alert('📋 Message copié ! Ouvre Snapchat pour lui envoyer.');
-              window.location.href = 'snapchat://';
-            });
-          });
+          if(dateParam && type === 'invite') {
+            const cleanDate = dateParam.replace(/-/g, '');
+            const cleanTime = timeParam ? timeParam.replace(':', '') + '00' : '190000';
+            const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activity + ' avec ' + sender)}&dates=${cleanDate}T${cleanTime}/${cleanDate}T${cleanTime}&details=${encodeURIComponent(noteParam || '')}&location=${encodeURIComponent(locationParam || '')}`;
+            document.getElementById('gcalBtn').href = gcalUrl;
+          } else {
+            document.getElementById('gcalBtn').style.display = 'none';
+          }
+        });
+
+        document.getElementById('reactBtn').addEventListener('click', () => {
+          localStorage.setItem(inviteId, "opened");
+          document.getElementById('viewMode').classList.add('hidden');
+          document.getElementById('successMode').classList.remove('hidden');
+          document.getElementById('successEmoji').innerText = type === 'pardon' ? '🥰' : '💖';
+          document.getElementById('successTitle').innerText = type === 'pardon' ? 'Pardon accepté !' : 'Message lu avec amour !';
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+          const replyMsg = type === 'pardon' 
+            ? `Coucou ${sender} ! C'est oublié, je te pardonne 🥰`
+            : `Coucou ${sender} ! Ton message m'a touché(e) au cœur ❤️`;
+          const encodedReply = encodeURIComponent(replyMsg);
+
+          document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodedReply}`;
+          document.getElementById('smsBtn').href = `sms:?body=${encodedReply}`;
+          document.getElementById('gcalBtn').style.display = 'none';
         });
       }
 
@@ -380,21 +450,31 @@
       document.getElementById('inviteForm').addEventListener('submit', (e) => {
         e.preventDefault();
 
+        const cardType = document.getElementById('inputType').value;
         const to = document.getElementById('inputInvitee').value;
         const from = document.getElementById('inputSender').value;
         const rel = document.getElementById('inputRelation').value;
-        const loc = document.getElementById('inputLocation').value || 'À définir';
-        const date = document.getElementById('inputDate').value;
-        const time = document.getElementById('inputTime').value;
         const note = document.getElementById('inputNote').value;
 
-        let selected = document.getElementById('inputCategory').value.split('|');
-        let emo = selected[0];
-        let act = selected[1];
-        let headline = selected[2];
-
         const baseUrl = window.location.href.split('?')[0];
-        let fullUrl = `${baseUrl}?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&rel=${encodeURIComponent(rel)}&act=${encodeURIComponent(act)}&emo=${encodeURIComponent(emo)}&title=${encodeURIComponent(headline)}&loc=${encodeURIComponent(loc)}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`;
+        let fullUrl = `${baseUrl}?type=${cardType}&to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&rel=${encodeURIComponent(rel)}`;
+
+        if (cardType === 'invite') {
+          const loc = document.getElementById('inputLocation').value || 'À définir';
+          const date = document.getElementById('inputDate').value;
+          const time = document.getElementById('inputTime').value;
+          let selected = document.getElementById('inputCategory').value.split('|');
+          let emo = selected[0];
+          let act = selected[1];
+          let headline = selected[2];
+
+          fullUrl += `&act=${encodeURIComponent(act)}&emo=${encodeURIComponent(emo)}&title=${encodeURIComponent(headline)}&loc=${encodeURIComponent(loc)}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`;
+        } else if (cardType === 'pardon') {
+          fullUrl += `&title=${encodeURIComponent("Demande de Pardon 🥺")}&emo=${encodeURIComponent("🥺")}`;
+        } else if (cardType === 'love') {
+          fullUrl += `&title=${encodeURIComponent("Mot d'Amour ❤️")}&emo=${encodeURIComponent("❤️")}`;
+        }
+
         if(note) fullUrl += `&note=${encodeURIComponent(note)}`;
 
         const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fullUrl)}`;
@@ -419,7 +499,7 @@
           const blobUrl = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = blobUrl;
-          link.download = 'QR_Code_Invitation.png';
+          link.download = 'QR_Code_Carte.png';
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
