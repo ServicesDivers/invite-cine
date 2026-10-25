@@ -14,8 +14,8 @@
     
     /* THÈMES DYNAMIQUES */
     body.theme-friend { background: linear-gradient(135deg, #fef3c7, #fde68a, #fef08a); color: #78350f; }
-    body.theme-flirt { background: linear-gradient(135deg, #4c1d95, #831843, #581c87); color: #fdf2f8; }
-    body.theme-love { background: linear-gradient(135deg, #881337, #9f1239, #4c0519); color: #fff1f2; }
+    body.theme-flirt { background: linear-gradient(135deg, #3b0764, #701a75, #4c1d95); color: #fdf2f8; }
+    body.theme-love { background: linear-gradient(135deg, #581c87, #831843, #3b0764); color: #fff1f2; }
     body.theme-default { background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042); color: #f8fafc; }
 
     /* ANIMATION DU CHAT */
@@ -35,11 +35,32 @@
       z-index: 99;
       pointer-events: none;
     }
+
+    /* PARTICULES FLOTTANTES EN ARRIÈRE-PLAN */
+    .bg-particle {
+      position: fixed;
+      top: -10vh;
+      font-size: 24px;
+      user-select: none;
+      pointer-events: none;
+      z-index: 0;
+      animation: fall linear infinite;
+      opacity: 0.6;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.7; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
   </style>
 </head>
-<body class="theme-default min-h-screen flex items-center justify-center p-3 sm:p-6">
+<body class="theme-default min-h-screen flex items-center justify-center p-3 sm:p-6 relative">
 
-  <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative overflow-hidden transition-all duration-500">
+  <!-- CONTENEUR DES PARTICULES DE FOND -->
+  <div id="particlesContainer" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+
+  <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative z-10 overflow-hidden transition-all duration-500">
     
     <!-- LOGO DE LA PLATEFORME -->
     <div class="flex items-center justify-center gap-2 mb-4 pb-3 border-b border-white/10">
@@ -47,9 +68,7 @@
       <span class="font-extrabold text-xs tracking-widest uppercase opacity-90 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-300">InviteLover</span>
     </div>
 
-    <!-- ========================================== -->
     <!-- VUE INVITÉ -->
-    <!-- ========================================== -->
     <div id="viewMode" class="hidden">
       <div id="relationBadge" class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 border tracking-wider uppercase">
         Pour toi, <span id="inviteeNameDisplay">...</span>
@@ -98,21 +117,17 @@
         <a id="whatsappBtn" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
           <span>📲 WhatsApp</span>
         </a>
-
         <a id="smsBtn" href="#" class="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
           <span>💬 SMS</span>
         </a>
-
         <button id="instaBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
           <span>📸 Instagram</span>
         </button>
-
         <button id="snapBtn" class="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
           <span>👻 Snapchat</span>
         </button>
       </div>
 
-      <!-- BOUCLE VIRALE -->
       <div class="mt-6 pt-5 border-t border-white/10">
         <a href="./" class="w-full block bg-gradient-to-r from-pink-500 to-indigo-600 hover:opacity-90 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition text-xs flex items-center justify-center gap-2 active:scale-95">
           <span>✨ Toi aussi, crée ton invitation gratuite !</span>
@@ -120,9 +135,7 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
     <!-- VUE CRÉATEUR -->
-    <!-- ========================================== -->
     <div id="createMode">
       <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 mb-1">Dis Oui 💌</h1>
       <p class="text-xs text-indigo-200/70 mb-5">Crée ton invitation interactive adaptée à votre relation.</p>
@@ -133,8 +146,8 @@
           <label class="block font-semibold mb-1 text-pink-300">👥 Quel est votre lien ?</label>
           <select id="inputRelation" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800 text-white font-semibold focus:outline-none focus:border-pink-500">
             <option value="friend">💛 Amie (Amical, fun & décontracté)</option>
-            <option value="flirt">🔥 Flirt (Piquant, taquin & séducteur)</option>
-            <option value="love">❤️ Copine / Amour (Romantique & passionné)</option>
+            <option value="flirt">🔥 Flirt (Coquin, taquin & piquant)</option>
+            <option value="love">🍫 Couple / Amour (Cœurs chocolat & romance)</option>
           </select>
         </div>
 
@@ -185,11 +198,11 @@
         <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl mt-4 text-left">
           <p class="font-bold text-amber-300 text-xs mb-1 flex items-center gap-1">❤️ Soutenez le projet :</p>
           <p class="text-[11px] text-indigo-200/80 leading-relaxed mb-2.5">
-            L'outil est 100% gratuit ! Si l'application vous plaît, soutenez la cause avec une contribution (au moins <strong>100 FCFA</strong>) par Mobile Money :
+            L'outil est 100% gratuit ! Soutenez la cause avec une contribution (au moins <strong>100 FCFA</strong>) par Mobile Money :
           </p>
           <div class="bg-slate-900/90 p-3 rounded-xl border border-amber-500/20 text-[11px] font-semibold space-y-1">
             <p class="text-yellow-400">📱 <strong>MTN Money :</strong> <span>069130594</span></p>
-            <p class="text-red-400">📱 <strong>Airtel Money :</strong> <span>053191164</span></p>
+            <p class="text-red-400">📱 <strong>Airtel Money :</strong> <span>069130594</span></p>
           </div>
         </div>
 
@@ -216,10 +229,32 @@
 
   </div>
 
-  <!-- CHAT ANIMÉ QUI SE PROMÈNE -->
+  <!-- CHAT ANIMÉ -->
   <div class="animated-cat">🐈‍⬛</div>
 
   <script>
+    // GÉNÉRATEUR DE PARTICULES FLOTTANTES SELON LE MODE
+    function initParticles(rel) {
+      const container = document.getElementById('particlesContainer');
+      container.innerHTML = '';
+      
+      let emojis = ['✨', '⭐', '💫'];
+      if (rel === 'friend') emojis = ['😂', '🎉', '🍕', '⭐', '🔥'];
+      if (rel === 'flirt') emojis = ['🔥', '😏', '💋', '😈', '👀', '✨'];
+      if (rel === 'love') emojis = ['🍫', '❤️', '🌹', '💖', '🥰', '✨'];
+
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div');
+        p.className = 'bg-particle';
+        p.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.animationDuration = (8 + Math.random() * 8) + 's';
+        p.style.animationDelay = (Math.random() * 5) + 's';
+        p.style.fontSize = (16 + Math.random() * 16) + 'px';
+        container.appendChild(p);
+      }
+    }
+
     const params = new URLSearchParams(window.location.search);
     const invitee = params.get('to');
     const sender = params.get('from');
@@ -232,6 +267,8 @@
     const noteParam = params.get('note');
     const relation = params.get('rel') || 'default';
 
+    initParticles(relation);
+
     const inviteId = "disoui_read_" + btoa(encodeURIComponent((invitee || '') + (sender || '') + (dateParam || ''))).replace(/=/g, '');
 
     const relationConfigs = {
@@ -243,15 +280,15 @@
       },
       flirt: {
         bodyClass: 'theme-flirt',
-        badge: '🔥 Mode Flirt',
+        badge: '🔥 Mode Flirt Coquin',
         badgeStyle: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
-        phrases: ["Trop timide ?", "Mauvaise touche 😏", "Essaie encore !", "Tu ne m'échapperas pas ✨", "Sérieusement ? 😘"]
+        phrases: ["Trop timide ? 😏", "Mauvaise touche...", "Tu ne m'échapperas pas 🔥", "Ose dire non 😈", "Sérieusement ? 😘"]
       },
       love: {
         bodyClass: 'theme-love',
-        badge: '❤️ Mode Amour',
+        badge: '🍫 Mode Couple & Romance',
         badgeStyle: 'bg-rose-500/20 text-rose-200 border-rose-500/30',
-        phrases: ["Mon cœur va briser 🥺", "Impossible de dire non !", "Dis oui à ton amour ❤️", "Refus interdit ✨", "Regarde-moi dans les yeux 🥺"]
+        phrases: ["Mon cœur va briser 🥺", "Interdit de refuser ❤️", "Dis oui à ton amour 🥰", "Regarde-moi dans les yeux ✨", "C'est un piège doux 🍫"]
       },
       default: {
         bodyClass: 'theme-default',
@@ -269,7 +306,7 @@
         document.getElementById('viewMode').classList.remove('hidden');
 
         const config = relationConfigs[relation] || relationConfigs.default;
-        document.body.className = `${config.bodyClass} min-h-screen flex items-center justify-center p-3 sm:p-6`;
+        document.body.className = `${config.bodyClass} min-h-screen flex items-center justify-center p-3 sm:p-6 relative`;
         
         const badgeElem = document.getElementById('relationBadge');
         badgeElem.className = `inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 border tracking-wider uppercase ${config.badgeStyle}`;
@@ -288,8 +325,7 @@
         if(dateParam) {
           const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
           const dateObj = new Date(dateParam + 'T00:00:00');
-          const dateFormatted = dateObj.toLocaleDateString('fr-FR', options);
-          document.getElementById('datetimeDisplay').innerText = timeParam ? `${dateFormatted} à ${timeParam}` : dateFormatted;
+          document.getElementById('datetimeDisplay').innerText = timeParam ? `${dateObj.toLocaleDateString('fr-FR', options)} à ${timeParam}` : dateObj.toLocaleDateString('fr-FR', options);
         }
 
         if(noteParam) {
