@@ -12,8 +12,8 @@
     .btn-moving { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
     input, select, textarea { font-size: 16px !important; }
     
-    /* ANCIENNE AMBIANCE COULEUR MARRON / CHOCOLAT & CHALEUREUSE */
-    body { background: linear-gradient(135deg, #3d1c14, #5c2c16, #26110b); color: #fdf8f6; }
+    /* ANCIENNE AMBIANCE COULEUR D'ORIGINE */
+    body { background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042); color: #f8fafc; }
 
     /* ANIMATION DU CHAT */
     @keyframes walk {
@@ -47,32 +47,324 @@
 
   <!-- ÉCRAN DE L'ENVELOPPE (VUE INVITÉ FERMÉE) -->
   <div id="envelopeScreen" class="hidden w-full max-w-sm text-center relative z-10 p-6">
-    <div class="bg-[#2c150e]/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-amber-500/20 text-center relative overflow-hidden">
+    <div class="bg-slate-900/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/20 text-center relative overflow-hidden">
       <div class="text-6xl mb-4 animate-bounce">💌</div>
-      <h2 class="text-xl font-extrabold text-amber-100 mb-2">Un message secret t'attend !</h2>
-      <p class="text-xs text-amber-200/70 mb-6">Envoyé spécialement par <span id="envSender" class="font-bold text-white">...</span></p>
+      <h2 class="text-xl font-extrabold text-white mb-2">Un message secret t'attend !</h2>
+      <p class="text-xs text-white/70 mb-6">Envoyé spécialement par <span id="envSender" class="font-bold text-white">...</span></p>
       
-      <button id="openEnvelopeBtn" class="w-full bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:opacity-90 text-white font-bold py-4 px-6 rounded-2xl shadow-xl transition active:scale-95 text-sm flex items-center justify-center gap-2">
+      <button id="openEnvelopeBtn" class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 text-white font-bold py-4 px-6 rounded-2xl shadow-xl transition active:scale-95 text-sm flex items-center justify-center gap-2">
         <span>Ouvrir l'enveloppe ✉️✨</span>
       </button>
     </div>
   </div>
 
   <!-- CARTE PRINCIPALE -->
-  <div id="mainCard" class="w-full max-w-md bg-[#2c150e]/90 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-amber-500/20 text-center relative z-10 overflow-hidden transition-all duration-500">
+  <div id="mainCard" class="w-full max-w-md bg-slate-900/90 backdrop-blur-xl p-5 sm:p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative z-10 overflow-hidden transition-all duration-500">
     
     <!-- LOGO -->
-    <div class="flex items-center justify-center gap-2 mb-4 pb-3 border-b border-amber-500/20">
+    <div class="flex items-center justify-center gap-2 mb-4 pb-3 border-b border-white/10">
       <span class="text-xl">💌</span>
-      <span class="font-extrabold text-xs tracking-widest uppercase opacity-90 bg-clip-text text-transparent bg-gradient-to-r from-amber-300 to-orange-300">InviteCiné</span>
+      <span class="font-extrabold text-xs tracking-widest uppercase opacity-90 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-indigo-300">InviteCiné</span>
     </div>
 
     <!-- ========================================== -->
     <!-- VUE INVITÉ (RÉCEPTION - APRÈS OUVERTURE) -->
     <!-- ========================================== -->
     <div id="viewMode" class="hidden card-appear">
-      <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 border tracking-wider uppercase bg-amber-500/20 text-amber-200 border-amber-500/30">
+      <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 border tracking-wider uppercase bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
         Pour toi, <span id="inviteeNameDisplay">...</span>
       </div>
       
-      <div id
+      <div id="emojiDisplay" class="text-5xl mb-2 animate-bounce">✨</div>
+      <h1 id="headlineDisplay" class="text-2xl font-extrabold text-white mb-1">On se fait une sortie ?</h1>
+      <p id="subHeadlineDisplay" class="text-xs text-white/70 italic mb-6">(dire non ne sert à rien, mais tu peux essayer)</p>
+
+      <div class="bg-black/30 backdrop-blur-md p-4 rounded-2xl border border-white/10 mb-6 text-left text-sm space-y-3 shadow-inner">
+        <p class="flex items-center gap-2">✨ <strong class="text-white/80">Activité :</strong> <span id="activityDisplay" class="font-bold text-white">Sortie</span></p>
+        
+        <div>
+          <a id="mapsLink" href="#" target="_blank" class="flex items-center justify-between bg-white/10 p-3 rounded-xl border border-white/10 hover:bg-white/20 transition text-xs text-white">
+            <span class="truncate pr-2">📍 <strong class="text-white/80">Lieu :</strong> <span id="locationDisplay">À définir</span></span>
+            <span class="text-amber-300 underline shrink-0 font-semibold">Maps ↗</span>
+          </a>
+        </div>
+
+        <p class="flex items-center gap-2">📅 <strong class="text-white/80">Quand :</strong> <span id="datetimeDisplay" class="font-bold text-white">À convenir</span></p>
+        <p id="noteContainer" class="hidden italic text-xs text-white/70 pt-2 border-t border-white/10">💬 <span id="noteDisplay"></span></p>
+        <p id="senderDisplay" class="text-xs text-right text-white/70 pt-2 border-t border-white/10">Proposé par <span class="font-bold text-white">...</span></p>
+      </div>
+
+      <div class="flex items-center justify-center gap-3 relative min-h-[80px] my-2">
+        <button id="yesBtn" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transition text-base z-10 active:scale-95">
+          Oui ! ✨
+        </button>
+        <button id="noBtn" class="btn-moving flex-1 bg-white/10 border border-white/20 text-white font-semibold py-3.5 px-6 rounded-2xl shadow-sm text-base z-20">
+          Non
+        </button>
+      </div>
+    </div>
+
+    <!-- ÉCRAN DE CONFIRMATION -->
+    <div id="successMode" class="hidden">
+      <div class="text-5xl mb-3">🎉🥳</div>
+      <h2 class="text-2xl font-extrabold text-white mb-1">Rendez-vous confirmé !</h2>
+      <p class="text-xs text-white/80 mb-4">Choisis comment tu veux me répondre :</p>
+      
+      <a id="gcalBtn" href="#" target="_blank" class="w-full block bg-white/10 border border-white/20 text-white hover:bg-white/20 font-semibold py-3 px-4 rounded-xl text-xs mb-4 shadow-sm transition">
+        📅 Ajouter à Google Calendar
+      </a>
+
+      <div class="space-y-2.5">
+        <a id="whatsappBtn" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
+          <span>📲 WhatsApp</span>
+        </a>
+        <a id="smsBtn" href="#" class="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-xs">
+          <span>💬 SMS</span>
+        </a>
+      </div>
+
+      <div class="mt-6 pt-5 border-t border-white/10">
+        <a href="./" class="w-full block bg-gradient-to-r from-pink-500 to-indigo-600 hover:opacity-90 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition text-xs flex items-center justify-center gap-2 active:scale-95">
+          <span>✨ Toi aussi, crée ton invitation gratuite !</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VUE CRÉATEUR -->
+    <!-- ========================================== -->
+    <div id="createMode">
+      <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 mb-1">InviteCiné 💌</h1>
+      <p class="text-xs text-indigo-200/70 mb-5">Crée ton invitation interactive simple et rapide.</p>
+
+      <form id="inviteForm" class="text-left space-y-3.5 text-xs">
+        
+        <div>
+          <label class="block font-semibold mb-1 text-indigo-200">Son prénom / surnom :</label>
+          <input type="text" id="inputInvitee" required placeholder="ex: Sarah" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-indigo-200">Ton prénom :</label>
+          <input type="text" id="inputSender" required placeholder="ex: Alex" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-indigo-200">Type d'activité :</label>
+          <select id="inputCategory" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800 text-white font-medium focus:outline-none focus:border-indigo-400">
+            <option value="🍿|Cinéma|Ça te dit un ciné ?">🍿 Cinéma</option>
+            <option value="🍷|Restaurant / Dîner|On se fait un resto ?">🍷 Restaurant / Dîner</option>
+            <option value="🍹|Prendre un verre|On va boire un verre ?">🍹 Boire un verre</option>
+            <option value="☕|Café & Balade|Un café & une balade ?">☕ Café & Balade</option>
+            <option value="🥳|Soirée / Fête|Viens à ma soirée !">🥳 Soirée / Fête</option>
+            <option value="🎳|Bowling / Jeu|Partie de Bowling ?">🎳 Bowling / Jeu</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-indigo-200">Lieu :</label>
+          <input type="text" id="inputLocation" placeholder="ex: Pathé Bellecour, Lyon" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+        </div>
+
+        <div class="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-indigo-200">Date :</label>
+            <input type="date" id="inputDate" required class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-indigo-200">Heure :</label>
+            <input type="time" id="inputTime" required class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-indigo-200">Petit mot (optionnel) :</label>
+          <input type="text" id="inputNote" placeholder="ex: Je m'occupe de tout !" class="w-full p-3.5 border border-indigo-500/30 rounded-xl bg-slate-800/80 text-white focus:outline-none focus:border-indigo-400">
+        </div>
+
+        <!-- ENCADRÉ SOUTIEN SOLIDAIRE MOBILE MONEY -->
+        <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl mt-4 text-left">
+          <p class="font-bold text-amber-300 text-xs mb-1 flex items-center gap-1">❤️ Soutenez le projet :</p>
+          <p class="text-[11px] text-indigo-200/80 leading-relaxed mb-2.5">
+            L'outil est 100% gratuit ! Soutenez la cause avec une contribution (au moins <strong>100 FCFA</strong>) par Mobile Money :
+          </p>
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-amber-500/20 text-[11px] font-semibold space-y-1">
+            <p class="text-yellow-400">📱 <strong>MTN Money :</strong> <span>069130594</span></p>
+            <p class="text-red-400">📱 <strong>Airtel Money :</strong> <span>069130594</span></p>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 text-white font-bold py-4 rounded-xl shadow-lg transition text-sm mt-4 active:scale-95">
+          Générer l'Invitation 🚀
+        </button>
+      </form>
+
+      <!-- RÉSULTAT -->
+      <div id="createdResult" class="hidden mt-6 pt-5 border-t border-indigo-500/20">
+        <p class="text-xs text-emerald-400 font-bold mb-2">✅ Invitation prête !</p>
+        <div class="flex items-center gap-2 mb-4">
+          <input type="text" id="generatedUrl" readonly class="w-full p-3 text-xs border border-indigo-500/30 rounded-xl bg-slate-800 text-indigo-200 focus:outline-none">
+          <button id="copyBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-xs font-bold shrink-0 active:scale-95">Copier</button>
+        </div>
+        <div class="text-center">
+          <img id="generatedQr" src="" alt="QR Code" class="mx-auto w-32 h-32 p-2 bg-white rounded-2xl mb-3 shadow-lg">
+          <button id="downloadQrBtn" class="w-full bg-slate-800 hover:bg-slate-700 border border-indigo-500/30 text-indigo-200 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
+            <span>📥 Télécharger l'image du QR Code</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHAT ANIMÉ -->
+  <div class="animated-cat">🐈‍⬛</div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const invitee = params.get('to');
+    const sender = params.get('from');
+    const activity = params.get('act');
+    const emoji = params.get('emo');
+    const title = params.get('title');
+    const locationParam = params.get('loc');
+    const dateParam = params.get('date');
+    const timeParam = params.get('time');
+    const noteParam = params.get('note');
+
+    const inviteId = "invitecine_read_" + btoa(encodeURIComponent((invitee || '') + (sender || '') + (dateParam || ''))).replace(/=/g, '');
+
+    const phrases = ["Une autre fois ?", "Tu rates un truc !", "Réfléchis bien 😉", "Tu es sûre ?", "Même pas en rêve ? 😜"];
+
+    if (invitee && sender) {
+      if (localStorage.getItem(inviteId) === "opened") {
+        window.location.href = window.location.pathname;
+      } else {
+        // AFFICHAGE DE L'ENVELOPPE FERMÉE EN PREMIER
+        document.getElementById('createMode').classList.add('hidden');
+        document.getElementById('mainCard').classList.add('hidden');
+        document.getElementById('envelopeScreen').classList.remove('hidden');
+        document.getElementById('envSender').innerText = sender;
+
+        // OUVERTURE DE L'ENVELOPPE AU CLIC
+        document.getElementById('openEnvelopeBtn').addEventListener('click', () => {
+          document.getElementById('envelopeScreen').classList.add('hidden');
+          document.getElementById('mainCard').classList.remove('hidden');
+          document.getElementById('viewMode').classList.remove('hidden');
+          confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+        });
+
+        document.getElementById('inviteeNameDisplay').innerText = invitee;
+        document.getElementById('senderDisplay').querySelector('span').innerText = sender;
+        document.getElementById('emojiDisplay').innerText = emoji || '✨';
+        document.getElementById('headlineDisplay').innerText = title || 'Ça te dit une sortie ?';
+        document.getElementById('activityDisplay').innerText = activity || 'Sortie';
+
+        if(locationParam) {
+          document.getElementById('locationDisplay').innerText = locationParam;
+          document.getElementById('mapsLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationParam)}`;
+        }
+
+        if(dateParam) {
+          const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+          const dateObj = new Date(dateParam + 'T00:00:00');
+          document.getElementById('datetimeDisplay').innerText = timeParam ? `${dateObj.toLocaleDateString('fr-FR', options)} à ${timeParam}` : dateObj.toLocaleDateString('fr-FR', options);
+        }
+
+        if(noteParam) {
+          document.getElementById('noteContainer').classList.remove('hidden');
+          document.getElementById('noteDisplay').innerText = noteParam;
+        }
+
+        const noBtn = document.getElementById('noBtn');
+        let isUp = true;
+        let phraseIdx = 0;
+
+        function moveNoButton(e) {
+          if(e) e.preventDefault();
+          noBtn.innerText = phrases[phraseIdx % phrases.length];
+          phraseIdx++;
+          noBtn.style.transform = isUp ? 'translateY(-45px)' : 'translateY(45px)';
+          isUp = !isUp;
+        }
+
+        noBtn.addEventListener('click', moveNoButton);
+        noBtn.addEventListener('touchstart', moveNoButton);
+
+        document.getElementById('yesBtn').addEventListener('click', () => {
+          localStorage.setItem(inviteId, "opened");
+          document.getElementById('viewMode').classList.add('hidden');
+          document.getElementById('successMode').classList.remove('hidden');
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+
+          const confirmMsg = `Coucou ${sender} ! C'est bon pour "${activity}" ! 🎉`;
+          const encodedMsg = encodeURIComponent(confirmMsg);
+
+          document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodedMsg}`;
+          document.getElementById('smsBtn').href = `sms:?body=${encodedMsg}`;
+
+          if(dateParam) {
+            const cleanDate = dateParam.replace(/-/g, '');
+            const cleanTime = timeParam ? timeParam.replace(':', '') + '00' : '190000';
+            const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activity + ' avec ' + sender)}&dates=${cleanDate}T${cleanTime}/${cleanDate}T${cleanTime}&details=${encodeURIComponent(noteParam || '')}&location=${encodeURIComponent(locationParam || '')}`;
+            document.getElementById('gcalBtn').href = gcalUrl;
+          } else {
+            document.getElementById('gcalBtn').style.display = 'none';
+          }
+        });
+      }
+
+    } else {
+      document.getElementById('inviteForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const to = document.getElementById('inputInvitee').value;
+        const from = document.getElementById('inputSender').value;
+        const loc = document.getElementById('inputLocation').value || 'À définir';
+        const date = document.getElementById('inputDate').value;
+        const time = document.getElementById('inputTime').value;
+        const note = document.getElementById('inputNote').value;
+
+        let selected = document.getElementById('inputCategory').value.split('|');
+        let emo = selected[0];
+        let act = selected[1];
+        let headline = selected[2];
+
+        const baseUrl = window.location.href.split('?')[0];
+        let fullUrl = `${baseUrl}?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&act=${encodeURIComponent(act)}&emo=${encodeURIComponent(emo)}&title=${encodeURIComponent(headline)}&loc=${encodeURIComponent(loc)}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`;
+        if(note) fullUrl += `&note=${encodeURIComponent(note)}`;
+
+        const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fullUrl)}`;
+        document.getElementById('generatedUrl').value = fullUrl;
+        document.getElementById('generatedQr').src = qrSrc;
+        document.getElementById('createdResult').classList.remove('hidden');
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', () => {
+        const copyText = document.getElementById('generatedUrl');
+        copyText.select();
+        navigator.clipboard.writeText(copyText.value);
+        document.getElementById('copyBtn').innerText = 'Copié !';
+        setTimeout(() => document.getElementById('copyBtn').innerText = 'Copier', 2000);
+      });
+
+      document.getElementById('downloadQrBtn').addEventListener('click', async () => {
+        const qrUrl = document.getElementById('generatedQr').src;
+        try {
+          const response = await fetch(qrUrl);
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = 'QR_Code_Invitation.png';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (err) {
+          window.open(qrUrl, '_blank');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
